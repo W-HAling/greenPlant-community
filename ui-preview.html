@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>养护任务 UI 原型方案预览</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #e5e7eb;
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  
+  /* 手机模拟器通用容器 */
+  .phone {
+    width: 375px;
+    height: 812px;
+    background: #f5f7f5;
+    border-radius: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    overflow: hidden;
+    position: relative;
+    border: 8px solid #fff;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  }
+  .header {
+    padding: 50px 20px 20px;
+    background: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    text-align: center;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+  }
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+  
+  /* 通用顶部筛选栏 */
+  .filter-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+  }
+  .filter-chip {
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: #fff;
+    color: #5f6b63;
+    font-size: 14px;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    cursor: pointer;
+  }
+  .filter-chip.active {
+    background: #3f8f52;
+    color: #fff;
+  }
+
+  /* ================= 方案 A: 极简清新卡片风 ================= */
+  .card-a {
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(63, 143, 82, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card-a .top { display: flex; gap: 12px; align-items: center; }
+  .card-a .avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #eef5ef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  .card-a .info { flex: 1; }
+  .card-a .title { font-size: 16px; font-weight: 600; color: #253128; margin-bottom: 4px; }
+  .card-a .subtitle { font-size: 13px; color: #6d7a70; }
+  .card-a .status { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+  .card-a .status.overdue { background: #fee2e2; color: #dc2626; }
+  .card-a .status.pending { background: #fef3c7; color: #d97706; }
+  .card-a .bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px dashed #e5e7eb;
+    padding-top: 12px;
+  }
+  .card-a .time { font-size: 12px; color: #9ca3af; }
+  .card-a .btn {
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: #3f8f52;
+    color: #fff;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* ================= 方案 B: 日程时间轴风 ================= */
+  .timeline-b { position: relative; padding-left: 24px; margin-top: 10px; }
+  .timeline-b::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e5e7eb;
+  }
+  .item-b { position: relative; margin-bottom: 24px; }
+  .item-b .dot {
+    position: absolute;
+    left: -24px;
+    top: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 1px #e5e7eb;
+    background: #e5e7eb;
+  }
+  .item-b.overdue .dot { background: #ef4444; box-shadow: 0 0 0 1px #ef4444; }
+  .item-b.pending .dot { background: #3f8f52; box-shadow: 0 0 0 1px #3f8f52; }
+  .item-b .bubble {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    position: relative;
+  }
+  .item-b .bubble::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 12px;
+    width: 12px;
+    height: 12px;
+    background: #fff;
+    transform: rotate(45deg);
+  }
+  .item-b .header-b { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center;}
+  .item-b .title { font-weight: 600; font-size: 15px; color: #111827; }
+  .item-b .time { font-size: 12px; color: #6b7280; font-weight: 500; }
+  .item-b .time.red { color: #ef4444; }
+  .item-b .desc { font-size: 13px; color: #6b7280; margin-bottom: 12px; line-height: 1.5; }
+  .item-b .action { text-align: right; }
+  .item-b .action span { display: inline-block; color: #3f8f52; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+  /* ================= 方案 C: 大图标渐变风 ================= */
+  .card-c {
+    position: relative;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 130px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  }
+  .card-c.water { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+  .card-c.prune { background: linear-gradient(135deg, #f59e0b, #fbbf24); }
+  .card-c.fertilize { background: linear-gradient(135deg, #10b981, #34d399); }
+  
+  .card-c .watermark {
+    position: absolute;
+    right: -10px;
+    bottom: -20px;
+    font-size: 100px;
+    opacity: 0.15;
+    transform: rotate(-15deg);
+    line-height: 1;
+    pointer-events: none;
+  }
+  .card-c .top-c {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .card-c .title { font-size: 22px; font-weight: 800; margin-bottom: 6px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); letter-spacing: 1px;}
+  .card-c .plant { font-size: 14px; opacity: 0.95; font-weight: 500;}
+  .card-c .status {
+    background: rgba(255,255,255,0.25);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    backdrop-filter: blur(4px);
+    font-weight: 600;
+  }
+  .card-c .bottom-c {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 24px;
+  }
+  .card-c .time { font-size: 13px; opacity: 0.9; }
+  .card-c .btn-c {
+    background: #fff;
+    color: #111827;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ================= 方案 A ================= -->
+  <div class="phone">
+    <div class="header">方案 A：极简清新卡片风</div>
+    <div class="content">
+      <div class="filter-bar">
+        <div class="filter-chip active">待执行 (2)</div>
+        <div class="filter-chip">已逾期 (1)</div>
+        <div class="filter-chip">已完成</div>
+      </div>
+      
+      <!-- 逾期任务卡片 -->
+      <div class="card-a">
+        <div class="top">
+          <div class="avatar">🪴</div>
+          <div class="info">
+            <div class="title">发财树 (前台)</div>
+            <div class="subtitle">💧 浇水 · 约200ml</div>
+          </div>
+          <div class="status overdue">逾期 1 天</div>
+        </div>
+        <div class="bottom">
+          <div class="time">应执行: 昨天</div>
+          <button class="btn">去完成</button>
+        </div>
+      </div>
+
+      <!-- 待办任务卡片 -->
+      <div class="card-a">
+        <div class="top">
+          <div class="avatar">🌿</div>
+          <div class="info">
+            <div class="title">绿萝 (会议室)</div>
+            <div class="subtitle">✂️ 修剪 · 枯黄叶片</div>
+          </div>
+          <div class="status pending">待办</div>
+        </div>
+        <div class="bottom">
+          <div class="time">应执行: 今天</div>
+          <button class="btn">去完成</button>
+        </div>
+      </div>
+      
+      <!-- 待办任务卡片 -->
+      <div class="card-a">
+        <div class="top">
+          <div class="avatar">🍀</div>
+          <div class="info">
+            <div class="title">龟背竹 (老板室)</div>
+            <div class="subtitle">🌱 施肥 · 缓释肥10g</div>
+          </div>
+          <div class="status pending">待办</div>
+        </div>
+        <div class="bottom">
+          <div class="time">应执行: 05-20</div>
+          <button class="btn">去完成</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 方案 B ================= -->
+  <div class="phone">
+    <div class="header">方案 B：日程时间轴风</div>
+    <div class="content">
+      <div class="filter-bar">
+        <div class="filter-chip active">全部日程</div>
+        <div class="filter-chip">今天</div>
+        <div class="filter-chip">未来 7 天</div>
+      </div>
+      
+      <div class="timeline-b">
+        <!-- 逾期节点 -->
+        <div class="item-b overdue">
+          <div class="dot"></div>
+          <div class="bubble">
+            <div class="header-b">
+              <div class="title">💧 浇水 - 发财树</div>
+              <div class="time red">昨天 逾期</div>
+            </div>
+            <div class="desc">土壤干透后浇透，约 200ml，注意托盘不要积水。</div>
+            <div class="action"><span>去处理 ➔</span></div>
+          </div>
+        </div>
+
+        <!-- 待办节点 -->
+        <div class="item-b pending">
+          <div class="dot"></div>
+          <div class="bubble">
+            <div class="header-b">
+              <div class="title">✂️ 修剪 - 绿萝</div>
+              <div class="time">今天</div>
+            </div>
+            <div class="desc">修剪底部发黄的枯叶。</div>
+            <div class="action"><span>去处理 ➔</span></div>
+          </div>
+        </div>
+        
+        <!-- 待办节点 -->
+        <div class="item-b pending">
+          <div class="dot"></div>
+          <div class="bubble">
+            <div class="header-b">
+              <div class="title">🌱 施肥 - 龟背竹</div>
+              <div class="time">明天</div>
+            </div>
+            <div class="desc">沿盆边埋入复合缓释肥 10g。</div>
+            <div class="action"><span>去处理 ➔</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= 方案 C ================= -->
+  <div class="phone">
+    <div class="header">方案 C：大图标渐变风</div>
+    <div class="content">
+      <div class="filter-bar">
+        <div class="filter-chip active">待办任务</div>
+        <div class="filter-chip">已完成</div>
+      </div>
+      
+      <!-- 蓝色：浇水 -->
+      <div class="card-c water">
+        <div class="watermark">💧</div>
+        <div class="top-c">
+          <div>
+            <div class="title">浇水</div>
+            <div class="plant">发财树 · 前台</div>
+          </div>
+          <div class="status" style="background: #ef4444; border: 1px solid rgba(255,255,255,0.5);">逾期 1 天</div>
+        </div>
+        <div class="bottom-c">
+          <div class="time">应执行: 昨天</div>
+          <div class="btn-c">去完成</div>
+        </div>
+      </div>
+
+      <!-- 橙色：修剪 -->
+      <div class="card-c prune">
+        <div class="watermark">✂️</div>
+        <div class="top-c">
+          <div>
+            <div class="title">修剪枯叶</div>
+            <div class="plant">绿萝 · 会议室</div>
+          </div>
+          <div class="status">今天</div>
+        </div>
+        <div class="bottom-c">
+          <div class="time">待执行</div>
+          <div class="btn-c">去完成</div>
+        </div>
+      </div>
+      
+      <!-- 绿色：施肥 -->
+      <div class="card-c fertilize">
+        <div class="watermark">🌱</div>
+        <div class="top-c">
+          <div>
+            <div class="title">施肥</div>
+            <div class="plant">龟背竹 · 老板室</div>
+          </div>
+          <div class="status">明天</div>
+        </div>
+        <div class="bottom-c">
+          <div class="time">待执行</div>
+          <div class="btn-c">去完成</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

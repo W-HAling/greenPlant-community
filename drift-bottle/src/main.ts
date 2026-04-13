@@ -63,21 +63,23 @@ const themes = [
         <div class="starry-moon"></div>
       </div>
       
-      <!-- 海洋与波浪 -->
+      <!-- 海洋区域：包含真实的波浪交叠效果 -->
       <div class="starry-sea">
-        <div class="starry-wave-2"></div>
-        <div class="starry-wave"></div>
+        <div class="starry-moon-reflection"></div>
+        <div class="starry-wave-back"></div>
+        <div class="starry-wave-mid"></div>
+        <div class="starry-wave-front"></div>
       </div>
       
-      <!-- 海面漂浮的瓶子 -->
+      <!-- 海面漂浮的瓶子：增加起伏与波纹 -->
       <div class="starry-bottle-sea">
         <div class="starry-paper"></div>
       </div>
       
-      <!-- 沙滩区域 -->
+      <!-- 带有冲刷动画的沙滩海岸线 -->
       <div class="starry-beach"></div>
       
-      <!-- 沙滩搁浅的瓶子 -->
+      <!-- 沙滩上搁浅的瓶子：带有强阴影和埋沙效果 -->
       <div class="starry-bottle-beach">
         <div class="starry-paper"></div>
       </div>

@@ -272,12 +272,13 @@ body, html {
 }
 
 /* =========================================
-   风格4：星空海滩风 (新增)
+   风格4：星空海滩风 (深度优化版)
    ========================================= */
 .theme-starry {
-  /* 夜晚的天空渐变色 */
-  background: linear-gradient(180deg, #0b1021 0%, #1b2745 40%, #2a4365 60%, #1e2f45 80%, #1a202c 100%);
+  /* 夜晚的天空渐变色，增加更深的蓝黑色调 */
+  background: linear-gradient(180deg, #050b14 0%, #0d1b2a 30%, #1a365d 60%, #2b4c7e 85%, #2c5282 100%);
   color: #fff;
+  perspective: 1000px; /* 开启 3D 透视，增强海面深度 */
 }
 .theme-starry .tab-container { background: rgba(255, 255, 255, 0.1); }
 .theme-starry .tab-btn { color: #ccc; }
@@ -288,11 +289,11 @@ body, html {
   position: absolute;
   top: 0;
   width: 100%;
-  height: 60%;
+  height: 55%;
   overflow: hidden;
 }
 
-/* 核心技巧：利用多重 box-shadow 绘制繁星点点 */
+/* 繁星点点优化：增加星星密度和不同大小 */
 .starry-stars {
   width: 2px;
   height: 2px;
@@ -305,148 +306,258 @@ body, html {
     85vw 40vh #fff, 95vw 15vh #fff, 5vw 30vh #fff, 50vw 45vh #fff;
   animation: twinkle 4s infinite alternate;
 }
-/* 次级小星星，增加纵深感 */
 .starry-stars-small {
   width: 1px;
   height: 1px;
   background: transparent;
   box-shadow: 
-    12vw 12vh #fff, 22vw 22vh #fff, 32vw 12vh #fff, 42vw 32vh #fff, 
-    52vw 17vh #fff, 62vw 37vh #fff, 72vw 22vh #fff, 82vw 12vh #fff, 
-    92vw 27vh #fff, 17vw 42vh #fff, 27vw 7vh #fff, 37vw 52vh #fff;
+    12vw 12vh rgba(255,255,255,0.8), 22vw 22vh rgba(255,255,255,0.8), 32vw 12vh rgba(255,255,255,0.8), 
+    42vw 32vh rgba(255,255,255,0.8), 52vw 17vh rgba(255,255,255,0.8), 62vw 37vh rgba(255,255,255,0.8), 
+    72vw 22vh rgba(255,255,255,0.8), 82vw 12vh rgba(255,255,255,0.8), 92vw 27vh rgba(255,255,255,0.8), 
+    17vw 42vh rgba(255,255,255,0.8), 27vw 7vh rgba(255,255,255,0.8), 37vw 52vh rgba(255,255,255,0.8),
+    8vw 18vh rgba(255,255,255,0.6), 28vw 38vh rgba(255,255,255,0.6), 48vw 8vh rgba(255,255,255,0.6),
+    68vw 48vh rgba(255,255,255,0.6), 88vw 18vh rgba(255,255,255,0.6), 98vw 38vh rgba(255,255,255,0.6);
   animation: twinkle 3s infinite alternate-reverse;
 }
 
-/* 月亮发光效果 */
+/* 月亮发光效果优化，增加月光倒影在海面上的光晕 */
 .starry-moon {
   position: absolute;
   top: 15%;
-  right: 15%;
-  width: 60px;
-  height: 60px;
+  right: 20%;
+  width: 50px;
+  height: 50px;
   background: #fff6d5;
   border-radius: 50%;
-  box-shadow: 0 0 20px #fff6d5, 0 0 50px rgba(255, 246, 213, 0.5);
+  box-shadow: 0 0 15px #fff6d5, 0 0 40px rgba(255, 246, 213, 0.6), 0 0 80px rgba(255, 246, 213, 0.3);
+}
+/* 月光海面反射 */
+.starry-moon-reflection {
+  position: absolute;
+  bottom: 0;
+  right: 15%;
+  width: 150px;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(255, 246, 213, 0.15) 0%, rgba(255, 246, 213, 0) 100%);
+  filter: blur(10px);
+  z-index: 2;
+  transform: skewX(-20deg);
 }
 
 @keyframes twinkle {
-  0% { opacity: 0.2; transform: scale(0.8); }
+  0% { opacity: 0.3; transform: scale(0.8); }
   100% { opacity: 1; transform: scale(1.2); }
 }
 
-/* 海洋区域 */
+/* ================== 真实海洋波动优化 ================== */
 .starry-sea {
   position: absolute;
-  bottom: 20%;
+  bottom: 25%; /* 提高海洋位置，给沙滩留出空间 */
   width: 100%;
-  height: 40%;
-  background: linear-gradient(180deg, rgba(42, 67, 101, 0) 0%, rgba(26, 32, 44, 0.9) 100%);
+  height: 35%;
+  /* 真实的海洋渐变：深处更暗，近岸更亮 */
+  background: linear-gradient(180deg, rgba(26, 54, 93, 0.9) 0%, rgba(44, 82, 130, 0.8) 50%, rgba(66, 153, 225, 0.6) 100%);
+  z-index: 1;
+  overflow: hidden;
+  /* 3D 旋转制造远近景透视感 */
+  transform-origin: bottom center;
+  transform: rotateX(20deg);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 海浪层叠设计：三层波浪，不同速度、不同透明度、不同高度，交错移动 */
+.starry-wave-back {
+  position: absolute;
+  top: 10%;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="rgba(255,255,255,0.05)" d="M0,160L48,149.3C96,139,192,117,288,133.3C384,149,480,203,576,218.7C672,235,768,213,864,181.3C960,149,1056,107,1152,106.7C1248,107,1344,149,1392,170.7L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+  background-size: 50% 100%;
+  animation: waveScroll 25s linear infinite;
   z-index: 1;
 }
 
-/* 动态海浪，颜色调暗适配夜景 */
-.starry-wave {
+.starry-wave-mid {
   position: absolute;
-  top: -20px;
-  left: -50%;
-  width: 200vw;
-  height: 150px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 40%;
-  animation: wave 10s linear infinite;
-}
-.starry-wave-2 {
-  position: absolute;
-  top: -10px;
-  left: -50%;
-  width: 200vw;
-  height: 150px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 45%;
-  animation: wave 15s linear infinite;
+  top: 30%;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="rgba(255,255,255,0.1)" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+  background-size: 50% 100%;
+  animation: waveScroll 15s linear infinite reverse;
+  z-index: 2;
 }
 
-/* 沙滩区域 */
+.starry-wave-front {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1440 320" xmlns="http://www.w3.org/2000/svg"><path fill="rgba(255,255,255,0.2)" d="M0,224L48,213.3C96,203,192,181,288,186.7C384,192,480,224,576,234.7C672,245,768,235,864,208C960,181,1056,139,1152,122.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') repeat-x;
+  background-size: 50% 100%;
+  animation: waveScroll 10s linear infinite;
+  z-index: 3;
+  /* 近岸水花效果 */
+  filter: drop-shadow(0 -5px 10px rgba(255,255,255,0.3));
+}
+
+@keyframes waveScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ================== 真实沙滩优化 ================== */
 .starry-beach {
   position: absolute;
   bottom: 0;
   width: 100%;
-  height: 20%;
-  background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
-  border-top: 2px solid rgba(255, 255, 255, 0.05);
-  z-index: 2;
-  box-shadow: 0 -10px 20px rgba(0,0,0,0.5);
+  height: 25%;
+  /* 模拟真实的暗色夜间沙滩纹理与光影渐变 */
+  background: radial-gradient(ellipse at center top, #4a3b32 0%, #2d241e 40%, #1a1511 100%);
+  z-index: 4; /* 沙滩在最上层，遮盖部分海水形成海岸线 */
+  /* 海水拍打在沙滩上的泡沫交界线 */
+  box-shadow: 0 -15px 30px rgba(255, 255, 255, 0.15), inset 0 20px 20px -20px rgba(255,255,255,0.2);
+  border-top-left-radius: 40% 15px;
+  border-top-right-radius: 40% 15px;
+}
+/* 海水冲刷沙滩的动态泡沫边缘 */
+.starry-beach::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: wash 4s ease-in-out infinite alternate;
+  filter: blur(2px);
+}
+@keyframes wash {
+  0% { transform: translateY(0) scaleY(1); opacity: 0.3; }
+  100% { transform: translateY(-5px) scaleY(2); opacity: 0.8; }
 }
 
-/* 海面上漂浮的瓶子 */
+/* ================== 瓶子优化 ================== */
+/* 海面上漂浮的瓶子 - 随着复杂海浪起伏 */
 .starry-bottle-sea {
   position: absolute;
-  bottom: 25%;
-  left: 25%;
-  transform: translateX(-50%) rotate(-15deg);
-  width: 40px;
-  height: 90px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
-  border: 1px solid rgba(255,255,255,0.5);
-  border-radius: 20px;
-  box-shadow: 0 0 15px rgba(255,255,255,0.2);
-  animation: floatSea 5s ease-in-out infinite;
-  z-index: 3;
+  bottom: 35%;
+  left: 20%;
+  width: 35px;
+  height: 80px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 18px;
+  box-shadow: 
+    -5px 5px 15px rgba(0,0,0,0.5), /* 背光面阴影 */
+    inset 5px 5px 10px rgba(255,255,255,0.6), /* 高光 */
+    0 0 20px rgba(255,255,255,0.2); /* 整体微光 */
+  /* 复杂的海上漂浮动画：上下起伏 + 左右轻微摇摆 + 倾斜角变化 */
+  animation: floatComplex 6s ease-in-out infinite;
+  z-index: 3; /* 在海浪的中间层之上 */
   display: flex;
   justify-content: center;
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
 }
 .starry-bottle-sea::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  width: 12px;
+  height: 6px;
+  background: #5d4037;
+  border-radius: 2px 2px 0 0;
+  box-shadow: inset 0 2px 2px rgba(255,255,255,0.3);
+}
+
+@keyframes floatComplex {
+  0% { transform: translate(0, 0) rotate(-20deg); }
+  25% { transform: translate(5px, -15px) rotate(-15deg); }
+  50% { transform: translate(10px, 0) rotate(-10deg); }
+  75% { transform: translate(5px, 10px) rotate(-18deg); }
+  100% { transform: translate(0, 0) rotate(-20deg); }
+}
+
+/* 水波纹涟漪，瓶子在海面引起的波纹 */
+.starry-bottle-sea::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotateX(70deg);
+  width: 60px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-radius: 50%;
+  animation: ripple 3s linear infinite;
+}
+@keyframes ripple {
+  0% { width: 30px; height: 10px; opacity: 0.8; }
+  100% { width: 80px; height: 30px; opacity: 0; }
+}
+
+
+/* 沙滩上搁浅的瓶子 - 半埋在沙子里 */
+.starry-bottle-beach {
+  position: absolute;
+  bottom: 12%;
+  right: 15%;
+  transform: rotate(70deg);
+  width: 45px;
+  height: 100px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.15) 100%);
+  border: 1px solid rgba(255,255,255,0.7);
+  border-radius: 22px;
+  /* 强烈的阴影表现搁浅在地面的真实感 */
+  box-shadow: 
+    -10px 15px 25px rgba(0,0,0,0.7), 
+    inset 5px 5px 15px rgba(255,255,255,0.8);
+  z-index: 5; /* 在沙滩层之上 */
+  display: flex;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+.starry-bottle-beach::before {
   content: '';
   position: absolute;
   top: -6px;
   width: 14px;
   height: 8px;
-  background: #3e2723;
+  background: #4e342e;
   border-radius: 3px 3px 0 0;
+  box-shadow: inset 0 2px 2px rgba(255,255,255,0.4);
 }
-
-/* 沙滩上搁浅的瓶子 */
-.starry-bottle-beach {
-  position: absolute;
-  bottom: 8%;
-  right: 20%;
-  transform: rotate(65deg);
-  width: 50px;
-  height: 110px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.15), rgba(255,255,255,0.4));
-  border: 1px solid rgba(255,255,255,0.6);
-  border-radius: 25px;
-  box-shadow: 5px 5px 15px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.5);
-  z-index: 4;
-  display: flex;
-  justify-content: center;
-  backdrop-filter: blur(4px);
-}
-.starry-bottle-beach::before {
+/* 瓶身周围的沙子堆积效果 */
+.starry-bottle-beach::after {
   content: '';
   position: absolute;
-  top: -8px;
-  width: 16px;
-  height: 10px;
-  background: #3e2723;
-  border-radius: 4px 4px 0 0;
+  bottom: 0;
+  right: -5px;
+  width: 50px;
+  height: 20px;
+  background: rgba(45, 36, 30, 0.8);
+  filter: blur(4px);
+  border-radius: 50%;
+  transform: rotate(-70deg);
+  z-index: -1;
 }
 
 /* 瓶中的信纸 */
 .starry-paper {
   margin-top: 15px;
-  width: 25px;
-  height: 40px;
+  width: 22px;
+  height: 35px;
   background: #fdf5e6;
   border-radius: 2px;
   opacity: 0.9;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-}
-
-@keyframes floatSea {
-  0%, 100% { transform: translateY(0) rotate(-15deg); }
-  50% { transform: translateY(-10px) rotate(-5deg); }
+  box-shadow: 
+    inset 2px 0 5px rgba(0,0,0,0.3), /* 纸张卷曲的阴影 */
+    inset -1px 0 2px rgba(255,255,255,0.8); /* 纸张边缘高光 */
 }
 
 
@@ -505,6 +616,7 @@ body, html {
   padding: 0 20px;
   box-sizing: border-box;
   z-index: 10;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8); /* 增加文字阴影，防止在复杂背景下看不清 */
 }
 .desc-text h2 {
   margin: 0 0 10px 0;

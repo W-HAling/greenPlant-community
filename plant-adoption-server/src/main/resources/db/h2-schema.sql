@@ -1,0 +1,113 @@
+CREATE TABLE IF NOT EXISTS sys_department (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  parent_id BIGINT DEFAULT 0,
+  level INT DEFAULT 1,
+  sort INT DEFAULT 0,
+  leader VARCHAR(50),
+  phone VARCHAR(20),
+  status TINYINT DEFAULT 1,
+  deleted TINYINT DEFAULT 0,
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS sys_config (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  config_key VARCHAR(100) NOT NULL,
+  config_value CLOB,
+  config_type VARCHAR(50) DEFAULT 'string',
+  description VARCHAR(255),
+  deleted TINYINT DEFAULT 0,
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_sys_config_key ON sys_config (config_key);
+
+CREATE TABLE IF NOT EXISTS sys_user (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50),
+  phone VARCHAR(20) NOT NULL,
+  password VARCHAR(255),
+  nickname VARCHAR(50),
+  avatar VARCHAR(500),
+  department_id BIGINT,
+  role VARCHAR(20) DEFAULT 'USER',
+  status TINYINT DEFAULT 1,
+  last_login_time TIMESTAMP,
+  deleted TINYINT DEFAULT 0,
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_sys_user_phone ON sys_user (phone);
+
+CREATE TABLE IF NOT EXISTS plant (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  variety VARCHAR(100),
+  location VARCHAR(200),
+  image_url VARCHAR(500),
+  qr_code_url VARCHAR(500),
+  status VARCHAR(20) DEFAULT 'AVAILABLE',
+  adopter_id BIGINT,
+  adoption_time TIMESTAMP,
+  last_care_time TIMESTAMP,
+  care_count INT DEFAULT 0,
+  description CLOB,
+  care_tips CLOB,
+  care_plan_template_id BIGINT,
+  deleted TINYINT DEFAULT 0,
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS adoption_record (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  plant_id BIGINT NOT NULL,
+  plant_name VARCHAR(100),
+  user_id BIGINT NOT NULL,
+  user_name VARCHAR(50),
+  status VARCHAR(20) DEFAULT 'PENDING',
+  apply_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  approve_time TIMESTAMP,
+  approver_id BIGINT,
+  approve_remark VARCHAR(500),
+  return_time TIMESTAMP,
+  return_reason VARCHAR(500),
+  deleted TINYINT DEFAULT 0,
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS care_log (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  plant_id BIGINT NOT NULL,
+  plant_name VARCHAR(100),
+  user_id BIGINT NOT NULL,
+  user_name VARCHAR(50),
+  care_type VARCHAR(50) NOT NULL,
+  care_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  description CLOB,
+  images VARCHAR(2000),
+  care_task_id BIGINT,
+  deleted TINYINT DEFAULT 0,
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS notification (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT NOT NULL,
+  title VARCHAR(200) NOT NULL,
+  content CLOB,
+  notification_type VARCHAR(50) NOT NULL,
+  related_id BIGINT,
+  related_type VARCHAR(50),
+  is_read TINYINT DEFAULT 0,
+  read_time TIMESTAMP,
+  deleted TINYINT DEFAULT 0,
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

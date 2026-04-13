@@ -56,40 +56,47 @@ const themes = [
     name: '星空海滩',
     className: 'theme-starry',
     html: `
-      <!-- 天空与星星、月亮 -->
+      <!-- 1. 绚丽星空 -->
       <div class="starry-sky">
-        <div class="starry-stars"></div>
-        <div class="starry-stars-small"></div>
-        <div class="starry-moon"></div>
+        <div class="milky-way"></div>
+        <div class="stars-layer-1"></div>
+        <div class="stars-layer-2"></div>
       </div>
       
-      <!-- 海洋区域：包含真实的波浪交叠效果 -->
+      <!-- 2. 海洋与动态扑岸浪花 -->
       <div class="starry-sea">
-        <div class="starry-moon-reflection"></div>
-        <div class="starry-wave-back"></div>
-        <div class="starry-wave-mid"></div>
-        <div class="starry-wave-front"></div>
+        <div class="sea-reflection"></div>
+        <div class="surf-wave surf-1"></div>
+        <div class="surf-wave surf-2"></div>
+        <div class="surf-wave surf-3"></div>
+        <div class="surf-wave surf-4"></div>
+        
+        <!-- 海中漂流瓶 -->
+        <div class="sea-bottle">
+          <div class="bottle-paper"></div>
+          <div class="bottle-highlight"></div>
+        </div>
       </div>
       
-      <!-- 海面漂浮的瓶子：增加起伏与波纹 -->
-      <div class="starry-bottle-sea">
-        <div class="starry-paper"></div>
+      <!-- 3. 湿润沙滩与贝壳 -->
+      <div class="starry-beach">
+        <div class="wet-sand"></div>
+        <div class="shell shell-1"></div>
+        <div class="shell shell-2"></div>
+        
+        <!-- 沙滩搁浅瓶 -->
+        <div class="beach-bottle">
+          <div class="bottle-paper"></div>
+          <div class="bottle-highlight"></div>
+        </div>
       </div>
       
-      <!-- 带有冲刷动画的沙滩海岸线 -->
-      <div class="starry-beach"></div>
-      
-      <!-- 沙滩上搁浅的瓶子：带有强阴影和埋沙效果 -->
-      <div class="starry-bottle-beach">
-        <div class="starry-paper"></div>
-      </div>
-      
-      <!-- 文字与操作按钮 -->
-      <div class="desc-text" style="z-index: 10;">
+      <!-- 4. 文字与操作按钮 -->
+      <div class="desc-text" style="z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
         <h2>星空与海滩</h2>
-        <p>漫天星辰下，等待被打捞的心事</p>
+        <p>漫天星辰下，听海浪拍打沙滩的声音</p>
         <div style="display: flex; gap: 10px; justify-content: center;">
-          <button class="action-btn" onclick="alert('你捡起了海面上漂浮的瓶子！')">捞起海中瓶</button>
+          <button class="action-btn" onclick="alert('你捡起了海面上的瓶子！')">捞起海中瓶</button>
           <button class="action-btn" onclick="alert('你捡起了沙滩上的瓶子！')">捡起沙滩瓶</button>
         </div>
       </div>

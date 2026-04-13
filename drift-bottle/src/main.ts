@@ -1,6 +1,7 @@
 // src/main.ts
 import './style.css'
 
+// 定义四个风格的主题配置，包含核心的 HTML 模板片段
 const themes = [
   {
     id: 'deep-sea',
@@ -49,23 +50,76 @@ const themes = [
         <button class="action-btn" onclick="alert('开启极简漂流之旅！')">开启漂流</button>
       </div>
     `
+  },
+  {
+    id: 'starry',
+    name: '星空海滩',
+    className: 'theme-starry',
+    html: `
+      <!-- 天空与星星、月亮 -->
+      <div class="starry-sky">
+        <div class="starry-stars"></div>
+        <div class="starry-stars-small"></div>
+        <div class="starry-moon"></div>
+      </div>
+      
+      <!-- 海洋与波浪 -->
+      <div class="starry-sea">
+        <div class="starry-wave-2"></div>
+        <div class="starry-wave"></div>
+      </div>
+      
+      <!-- 海面漂浮的瓶子 -->
+      <div class="starry-bottle-sea">
+        <div class="starry-paper"></div>
+      </div>
+      
+      <!-- 沙滩区域 -->
+      <div class="starry-beach"></div>
+      
+      <!-- 沙滩搁浅的瓶子 -->
+      <div class="starry-bottle-beach">
+        <div class="starry-paper"></div>
+      </div>
+      
+      <!-- 文字与操作按钮 -->
+      <div class="desc-text" style="z-index: 10;">
+        <h2>星空与海滩</h2>
+        <p>漫天星辰下，等待被打捞的心事</p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+          <button class="action-btn" onclick="alert('你捡起了海面上漂浮的瓶子！')">捞起海中瓶</button>
+          <button class="action-btn" onclick="alert('你捡起了沙滩上的瓶子！')">捡起沙滩瓶</button>
+        </div>
+      </div>
+    `
   }
 ];
 
-let currentTheme = 0;
+// 默认切换到第四个风格（星空海滩）
+let currentTheme = 3;
 
+/**
+ * 核心渲染函数
+ * 根据当前的主题索引，渲染对应的 HTML 结构并绑定事件
+ */
 function render() {
-  const app = document.querySelector<HTMLDivElement>('#app')!;
+  const app = document.querySelector<HTMLDivElement>('#app');
+  // 提前返回，避免空指针（符合编码规范：避免多层嵌套，提前返回）
+  if (!app) return;
+
   const theme = themes[currentTheme];
   
+  // 切换外层容器的样式类，触发背景过渡
   app.className = theme.className;
   
+  // 动态生成顶部 Tab 按钮
   const tabsHtml = themes.map((t, index) => `
     <button class="tab-btn ${index === currentTheme ? 'active' : ''}" data-index="${index}">
       ${t.name}
     </button>
   `).join('');
 
+  // 注入 DOM
   app.innerHTML = `
     <div class="tab-container">
       ${tabsHtml}
@@ -75,12 +129,15 @@ function render() {
     </div>
   `;
 
-  // 绑定事件
+  // 重新绑定 Tab 点击事件
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const target = e.target as HTMLButtonElement;
-      currentTheme = parseInt(target.dataset.index || '0', 10);
-      render();
+      const indexStr = target.dataset.index;
+      if (indexStr !== undefined) {
+        currentTheme = parseInt(indexStr, 10);
+        render();
+      }
     });
   });
 }

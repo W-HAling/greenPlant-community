@@ -52,14 +52,14 @@ body, html {
   color: #fff;
 }
 
-/* 风格1：梦幻深海风 */
+/* =========================================
+   风格1：梦幻深海风
+   ========================================= */
 .theme-deep-sea {
   background: linear-gradient(180deg, #050b14 0%, #1a2a44 100%);
   color: #fff;
 }
-.theme-deep-sea .tab-container {
-  background: rgba(255, 255, 255, 0.1);
-}
+.theme-deep-sea .tab-container { background: rgba(255, 255, 255, 0.1); }
 .theme-deep-sea .tab-btn { color: #ccc; }
 .theme-deep-sea .tab-btn.active { background: #4a90e2; color: #fff; }
 
@@ -120,7 +120,9 @@ body, html {
   100% { transform: translateY(-50px); }
 }
 
-/* 风格2：清新沙滩风 */
+/* =========================================
+   风格2：清新沙滩风
+   ========================================= */
 .theme-beach {
   background: linear-gradient(180deg, #74ebd5 0%, #acb6e5 50%, #f6d365 100%);
   color: #333;
@@ -190,7 +192,9 @@ body, html {
   100% { transform: rotate(360deg); }
 }
 
-/* 风格3：极简毛玻璃风 */
+/* =========================================
+   风格3：极简毛玻璃风
+   ========================================= */
 .theme-glass {
   background: #f0f2f5;
   color: #333;
@@ -267,7 +271,188 @@ body, html {
   50% { transform: translateY(10px); }
 }
 
-/* 通用 UI 元素 */
+/* =========================================
+   风格4：星空海滩风 (新增)
+   ========================================= */
+.theme-starry {
+  /* 夜晚的天空渐变色 */
+  background: linear-gradient(180deg, #0b1021 0%, #1b2745 40%, #2a4365 60%, #1e2f45 80%, #1a202c 100%);
+  color: #fff;
+}
+.theme-starry .tab-container { background: rgba(255, 255, 255, 0.1); }
+.theme-starry .tab-btn { color: #ccc; }
+.theme-starry .tab-btn.active { background: #f6d365; color: #333; }
+
+/* 星空容器 */
+.starry-sky {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 60%;
+  overflow: hidden;
+}
+
+/* 核心技巧：利用多重 box-shadow 绘制繁星点点 */
+.starry-stars {
+  width: 2px;
+  height: 2px;
+  background: transparent;
+  box-shadow: 
+    10vw 10vh #fff, 20vw 25vh #fff, 30vw 10vh #fff, 40vw 30vh #fff, 
+    50vw 15vh #fff, 60vw 35vh #fff, 70vw 20vh #fff, 80vw 10vh #fff, 
+    90vw 25vh #fff, 15vw 40vh #fff, 25vw 5vh #fff, 35vw 50vh #fff, 
+    45vw 20vh #fff, 55vw 5vh #fff, 65vw 45vh #fff, 75vw 30vh #fff, 
+    85vw 40vh #fff, 95vw 15vh #fff, 5vw 30vh #fff, 50vw 45vh #fff;
+  animation: twinkle 4s infinite alternate;
+}
+/* 次级小星星，增加纵深感 */
+.starry-stars-small {
+  width: 1px;
+  height: 1px;
+  background: transparent;
+  box-shadow: 
+    12vw 12vh #fff, 22vw 22vh #fff, 32vw 12vh #fff, 42vw 32vh #fff, 
+    52vw 17vh #fff, 62vw 37vh #fff, 72vw 22vh #fff, 82vw 12vh #fff, 
+    92vw 27vh #fff, 17vw 42vh #fff, 27vw 7vh #fff, 37vw 52vh #fff;
+  animation: twinkle 3s infinite alternate-reverse;
+}
+
+/* 月亮发光效果 */
+.starry-moon {
+  position: absolute;
+  top: 15%;
+  right: 15%;
+  width: 60px;
+  height: 60px;
+  background: #fff6d5;
+  border-radius: 50%;
+  box-shadow: 0 0 20px #fff6d5, 0 0 50px rgba(255, 246, 213, 0.5);
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.2; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.2); }
+}
+
+/* 海洋区域 */
+.starry-sea {
+  position: absolute;
+  bottom: 20%;
+  width: 100%;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(42, 67, 101, 0) 0%, rgba(26, 32, 44, 0.9) 100%);
+  z-index: 1;
+}
+
+/* 动态海浪，颜色调暗适配夜景 */
+.starry-wave {
+  position: absolute;
+  top: -20px;
+  left: -50%;
+  width: 200vw;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 40%;
+  animation: wave 10s linear infinite;
+}
+.starry-wave-2 {
+  position: absolute;
+  top: -10px;
+  left: -50%;
+  width: 200vw;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 45%;
+  animation: wave 15s linear infinite;
+}
+
+/* 沙滩区域 */
+.starry-beach {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 20%;
+  background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
+  border-top: 2px solid rgba(255, 255, 255, 0.05);
+  z-index: 2;
+  box-shadow: 0 -10px 20px rgba(0,0,0,0.5);
+}
+
+/* 海面上漂浮的瓶子 */
+.starry-bottle-sea {
+  position: absolute;
+  bottom: 25%;
+  left: 25%;
+  transform: translateX(-50%) rotate(-15deg);
+  width: 40px;
+  height: 90px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.3));
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(255,255,255,0.2);
+  animation: floatSea 5s ease-in-out infinite;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+.starry-bottle-sea::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  width: 14px;
+  height: 8px;
+  background: #3e2723;
+  border-radius: 3px 3px 0 0;
+}
+
+/* 沙滩上搁浅的瓶子 */
+.starry-bottle-beach {
+  position: absolute;
+  bottom: 8%;
+  right: 20%;
+  transform: rotate(65deg);
+  width: 50px;
+  height: 110px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15), rgba(255,255,255,0.4));
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: 25px;
+  box-shadow: 5px 5px 15px rgba(0,0,0,0.4), inset 0 0 10px rgba(255,255,255,0.5);
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.starry-bottle-beach::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  width: 16px;
+  height: 10px;
+  background: #3e2723;
+  border-radius: 4px 4px 0 0;
+}
+
+/* 瓶中的信纸 */
+.starry-paper {
+  margin-top: 15px;
+  width: 25px;
+  height: 40px;
+  background: #fdf5e6;
+  border-radius: 2px;
+  opacity: 0.9;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+}
+
+@keyframes floatSea {
+  0%, 100% { transform: translateY(0) rotate(-15deg); }
+  50% { transform: translateY(-10px) rotate(-5deg); }
+}
+
+
+/* =========================================
+   通用 UI 元素
+   ========================================= */
 .action-btn {
   margin-top: 20px;
   padding: 12px 30px;
@@ -277,6 +462,8 @@ body, html {
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s;
+  z-index: 20;
+  position: relative;
 }
 .action-btn:active {
   transform: scale(0.95);
@@ -297,6 +484,17 @@ body, html {
   border: 1px solid #fff;
   backdrop-filter: blur(10px);
 }
+.theme-starry .action-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+.theme-starry .action-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 .desc-text {
   position: absolute;
   bottom: 80px;

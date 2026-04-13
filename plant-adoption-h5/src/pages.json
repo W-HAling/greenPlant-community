@@ -1,0 +1,171 @@
+{
+  "pages": [
+    {
+      "path": "pages/index/index",
+      "style": {
+        "navigationBarTitleText": "绿植领养",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarTitleText": "登录",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/register/register",
+      "style": {
+        "navigationBarTitleText": "注册",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/plant/list",
+      "style": {
+        "navigationBarTitleText": "绿植列表"
+      }
+    },
+    {
+      "path": "pages/plant/detail",
+      "style": {
+        "navigationBarTitleText": "绿植详情",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/adoption/my",
+      "style": {
+        "navigationBarTitleText": "我的领养",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/care/list",
+      "style": {
+        "navigationBarTitleText": "养护记录",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/care/add",
+      "style": {
+        "navigationBarTitleText": "添加养护记录",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/care/tasks",
+      "style": {
+        "navigationBarTitleText": "我的养护任务",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/care/adjust",
+      "style": {
+        "navigationBarTitleText": "调整任务"
+      }
+    },
+    {
+      "path": "pages/community/list",
+      "style": {
+        "navigationBarTitleText": "社区",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/community/detail",
+      "style": {
+        "navigationBarTitleText": "帖子详情",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/community/publish",
+      "style": {
+        "navigationBarTitleText": "发布帖子",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/drift-bottle/index",
+      "style": {
+        "navigationBarTitleText": "漂流瓶",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/drift-bottle/throw",
+      "style": {
+        "navigationBarTitleText": "扔漂流瓶",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/drift-bottle/my",
+      "style": {
+        "navigationBarTitleText": "我的漂流瓶",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/notification/list",
+      "style": {
+        "navigationBarTitleText": "消息通知",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/user/profile",
+      "style": {
+        "navigationBarTitleText": "个人中心",
+        "navigationStyle": "custom"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "绿植领养",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#F5F7F5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#4CAF50",
+    "borderStyle": "white",
+    "backgroundColor": "#FFFFFF",
+    "fontSize": "12px",
+    "iconWidth": "26px",
+    "iconHeight": "26px",
+    "spacing": "6px",
+    "height": "56px",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "static/tabbar/home.svg",
+        "selectedIconPath": "static/tabbar/home-active.svg"
+      },
+      {
+        "pagePath": "pages/plant/list",
+        "text": "绿植",
+        "iconPath": "static/tabbar/plant.svg",
+        "selectedIconPath": "static/tabbar/plant-active.svg"
+      },
+      {
+        "pagePath": "pages/community/list",
+        "text": "社区",
+        "iconPath": "static/tabbar/community.svg",
+        "selectedIconPath": "static/tabbar/community-active.svg"
+      },
+      {
+        "pagePath": "pages/user/profile",
+        "text": "我的",
+        "iconPath": "static/tabbar/user.svg",
+        "selectedIconPath": "static/tabbar/user-active.svg"
+      }
+    ]
+  }
+}

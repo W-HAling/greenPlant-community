@@ -1,0 +1,76 @@
+# AI/IDE 工具配置目录（各IDE/AI助手自动生成，无需版本管理）
+.adal/
+.agents/
+.bob/
+.augment/
+.claude/
+.codebuddy/
+.commandcode/
+.continue/
+.cortex/
+.crush/
+.factory/
+.goose/
+.idea/
+.iflow/
+.junie/
+.kilocode/
+.kiro/
+.kode/
+.mcpjam/
+.mux/
+.neovate/
+.openhands/
+.pi/
+.pochi/
+.qoder/
+.qwen/
+.roo/
+.trae/
+.vibe/
+.windsurf/
+.zencoder/
+
+# Skills 目录（AI助手技能文件）
+skills/
+skills-lock.json
+
+# 项目文档（本地参考）
+docs/
+
+# 依赖和构建产物
+plant-adoption-admin/node_modules/
+plant-adoption-h5/node_modules/
+plant-adoption-server/.m2/
+plant-adoption-server/target/
+
+# 敏感配置文件（包含数据库密码等）
+application-dev.yml
+application-local.yml
+application-prod.yml
+*-local.yml
+*-dev.yml
+
+# 常规忽略
+*.log
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.env
+.env.local
+
+# 编译产物
+*.class
+*.jar
+*.war
+
+# IDE
+*.iml
+.idea/
+.vscode/
+
+# 系统文件
+*.bak
+*.tmp

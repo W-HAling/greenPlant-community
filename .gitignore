@@ -38,6 +38,9 @@ skills-lock.json
 # 项目文档（本地参考）
 docs/
 
+# 图片资源目录
+images/
+
 # 依赖和构建产物
 plant-adoption-admin/node_modules/
 plant-adoption-h5/node_modules/

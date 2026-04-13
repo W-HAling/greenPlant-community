@@ -1,0 +1,317 @@
+/* src/style.css */
+:root {
+  --tab-bg: rgba(255, 255, 255, 0.8);
+  --tab-color: #333;
+}
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  transition: background 0.5s ease;
+}
+
+/* 顶部切换栏 */
+.tab-container {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  background: var(--tab-bg);
+  padding: 8px;
+  border-radius: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.tab-btn {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--tab-color);
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+.tab-btn.active {
+  background: #333;
+  color: #fff;
+}
+
+/* 风格1：梦幻深海风 */
+.theme-deep-sea {
+  background: linear-gradient(180deg, #050b14 0%, #1a2a44 100%);
+  color: #fff;
+}
+.theme-deep-sea .tab-container {
+  background: rgba(255, 255, 255, 0.1);
+}
+.theme-deep-sea .tab-btn { color: #ccc; }
+.theme-deep-sea .tab-btn.active { background: #4a90e2; color: #fff; }
+
+.deep-sea-bottle {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 160px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(74, 144, 226, 0.3));
+  border: 2px solid rgba(74, 144, 226, 0.6);
+  border-radius: 40px;
+  box-shadow: 0 0 30px rgba(74, 144, 226, 0.4), inset 0 0 20px rgba(74, 144, 226, 0.2);
+  animation: floatDeepSea 4s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.deep-sea-bottle::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 15px;
+  background: #8b5a2b;
+  border-radius: 5px 5px 0 0;
+}
+.deep-sea-glow {
+  width: 30px;
+  height: 30px;
+  background: #fff;
+  border-radius: 50%;
+  filter: blur(8px);
+  animation: pulseGlow 2s infinite alternate;
+}
+@keyframes floatDeepSea {
+  0%, 100% { transform: translate(-50%, -40%); }
+  50% { transform: translate(-50%, -60%); }
+}
+@keyframes pulseGlow {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+.deep-sea-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: particleMove 20s linear infinite;
+  opacity: 0.5;
+}
+@keyframes particleMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50px); }
+}
+
+/* 风格2：清新沙滩风 */
+.theme-beach {
+  background: linear-gradient(180deg, #74ebd5 0%, #acb6e5 50%, #f6d365 100%);
+  color: #333;
+}
+.beach-bottle {
+  position: absolute;
+  bottom: 25%;
+  left: 50%;
+  transform: translateX(-50%) rotate(15deg);
+  width: 70px;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255,255,255,0.8);
+  border-radius: 35px;
+  box-shadow: 10px 10px 20px rgba(0,0,0,0.1), inset 5px 5px 10px rgba(255,255,255,0.8);
+  animation: rockBeach 6s ease-in-out infinite;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.beach-bottle::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 12px;
+  background: #d4a373;
+  border-radius: 4px 4px 0 0;
+}
+.beach-paper {
+  width: 40px;
+  height: 60px;
+  background: #fefae0;
+  border-radius: 3px;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+@keyframes rockBeach {
+  0%, 100% { transform: translateX(-50%) rotate(10deg); }
+  50% { transform: translateX(-50%) rotate(20deg); }
+}
+.beach-wave {
+  position: absolute;
+  bottom: 10%;
+  width: 200vw;
+  height: 300px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 40%;
+  animation: wave 8s linear infinite;
+  left: -50%;
+}
+.beach-wave-2 {
+  position: absolute;
+  bottom: 8%;
+  width: 200vw;
+  height: 300px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 45%;
+  animation: wave 12s linear infinite;
+  left: -50%;
+}
+@keyframes wave {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 风格3：极简毛玻璃风 */
+.theme-glass {
+  background: #f0f2f5;
+  color: #333;
+  overflow: hidden;
+}
+.glass-blob1 {
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  width: 300px;
+  height: 300px;
+  background: #ff9a9e;
+  border-radius: 50%;
+  filter: blur(60px);
+  animation: moveBlob 10s infinite alternate;
+}
+.glass-blob2 {
+  position: absolute;
+  bottom: 10%;
+  right: 10%;
+  width: 400px;
+  height: 400px;
+  background: #a18cd1;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: moveBlob 12s infinite alternate-reverse;
+}
+@keyframes moveBlob {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(50px, 50px) scale(1.1); }
+}
+.glass-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 280px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 10;
+}
+.glass-icon {
+  width: 60px;
+  height: 120px;
+  border: 3px solid #fff;
+  border-radius: 30px;
+  position: relative;
+  margin-bottom: 30px;
+  animation: floatGlass 3s ease-in-out infinite;
+}
+.glass-icon::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  background: rgba(255,255,255,0.8);
+  border-radius: 20px;
+}
+@keyframes floatGlass {
+  0%, 100% { transform: translateY(-10px); }
+  50% { transform: translateY(10px); }
+}
+
+/* 通用 UI 元素 */
+.action-btn {
+  margin-top: 20px;
+  padding: 12px 30px;
+  border-radius: 25px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.action-btn:active {
+  transform: scale(0.95);
+}
+.theme-deep-sea .action-btn {
+  background: rgba(74, 144, 226, 0.8);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+}
+.theme-beach .action-btn {
+  background: #fff;
+  color: #d4a373;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.theme-glass .action-btn {
+  background: rgba(255,255,255,0.8);
+  color: #a18cd1;
+  border: 1px solid #fff;
+  backdrop-filter: blur(10px);
+}
+.desc-text {
+  position: absolute;
+  bottom: 80px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.9;
+  padding: 0 20px;
+  box-sizing: border-box;
+  z-index: 10;
+}
+.desc-text h2 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+}
+.desc-text p {
+  margin: 0 0 20px 0;
+}

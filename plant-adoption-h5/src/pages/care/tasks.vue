@@ -13,23 +13,33 @@
     </view>
 
     <view class="task-list" v-if="tasks.length">
-      <view class="task-card" v-for="task in tasks" :key="task.id">
-        <view class="task-header">
-          <view>
-            <text class="task-plant">{{ task.plantName }}</text>
-            <text class="task-type">{{ careTypeMap[task.careType?.toUpperCase()] || task.careType }}</text>
-          </view>
-          <view class="task-status" :class="task.status.toLowerCase()">
+      <view 
+        class="task-card-mix" 
+        v-for="task in tasks" 
+        :key="task.id"
+        :class="[getCareClass(task.careType), task.status.toLowerCase()]"
+      >
+        <!-- Watermark -->
+        <view class="watermark">{{ careEmojiMap[task.careType?.toUpperCase()] || '✨' }}</view>
+        
+        <view class="top">
+          <!-- Avatar -->
+          <view class="avatar">{{ plantAvatarMap[task.careType?.toUpperCase()] || '🌵' }}</view>
+          <div class="info">
+            <view class="title">{{ task.plantName }}</view>
+            <view class="subtitle">{{ careTypeMap[task.careType?.toUpperCase()] || task.careType }} <template v-if="task.careDetail">· {{ task.careDetail }}</template></view>
+          </div>
+          <!-- Status -->
+          <view class="status" :class="task.status.toLowerCase()">
             {{ statusMap[task.status] || task.status }}
           </view>
         </view>
-
-        <view class="task-detail">{{ task.careDetail }}</view>
-        <view class="task-footer">
-          <text class="task-date">应执行：{{ formatDate(task.dueDate) }}</text>
-          <view class="task-actions" v-if="task.status === 'PENDING' || task.status === 'OVERDUE'">
-            <button class="task-btn ghost" @click="goAdjust(task)">调整</button>
-            <button class="task-btn" @click="goExecute(task)">去完成</button>
+        
+        <view class="bottom">
+          <view class="time">应执行: {{ formatDate(task.dueDate) }}</view>
+          <view class="btn-group" v-if="task.status === 'PENDING' || task.status === 'OVERDUE'">
+            <button class="btn ghost" @click.stop="goAdjust(task)">调整</button>
+            <button class="btn primary" @click.stop="goExecute(task)">去完成</button>
           </view>
         </view>
       </view>
@@ -67,6 +77,25 @@ const careTypeMap: Record<string, string> = {
   FERTILIZE: '施肥',
   PRUNE: '修剪',
   OTHER: '其他'
+}
+
+const careEmojiMap: Record<string, string> = {
+  WATER: '💧',
+  FERTILIZE: '🌱',
+  PRUNE: '✂️',
+  OTHER: '✨'
+}
+
+const plantAvatarMap: Record<string, string> = {
+  WATER: '🪴',
+  FERTILIZE: '🍀',
+  PRUNE: '🌿',
+  OTHER: '🌵'
+}
+
+const getCareClass = (careType: string | undefined) => {
+  if (!careType) return 'other'
+  return careType.toLowerCase()
 }
 
 const formatDate = (value: string) => {
@@ -142,89 +171,149 @@ onShow(() => {
   gap: 20rpx;
 }
 
-.task-card {
+.task-card-mix {
   background: #ffffff;
-  border-radius: 20rpx;
-  padding: 24rpx;
-  box-shadow: 0 8rpx 20rpx rgba(63, 143, 82, 0.08);
-}
-
-.task-header {
+  border-radius: 32rpx;
+  padding: 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(63, 143, 82, 0.08);
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16rpx;
-}
+  flex-direction: column;
+  gap: 24rpx;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
-.task-plant {
-  display: block;
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #253128;
-}
+  &:active {
+    transform: scale(0.98);
+  }
 
-.task-type {
-  display: block;
-  margin-top: 8rpx;
-  font-size: 24rpx;
-  color: #6d7a70;
-}
+  /* Watermark */
+  .watermark {
+    position: absolute;
+    right: -24rpx;
+    bottom: -30rpx;
+    font-size: 180rpx;
+    line-height: 1;
+    opacity: 0.06;
+    transform: rotate(-15deg);
+    pointer-events: none;
+    z-index: 0;
+  }
 
-.task-status {
-  padding: 8rpx 18rpx;
-  border-radius: 999rpx;
-  font-size: 22rpx;
-}
+  &.water .watermark { opacity: 0.08; filter: grayscale(50%) brightness(1.2); }
+  &.prune .watermark { opacity: 0.06; filter: grayscale(30%); }
+  &.fertilize .watermark { opacity: 0.08; filter: grayscale(20%); }
 
-.task-status.pending,
-.task-status.overdue {
-  background: #fff3d6;
-  color: #9a6a00;
-}
+  /* Ensure content is above watermark */
+  .top, .bottom {
+    position: relative;
+    z-index: 1;
+  }
 
-.task-status.done {
-  background: #e7f6ea;
-  color: #2f7d42;
-}
+  .top {
+    display: flex;
+    gap: 24rpx;
+    align-items: center;
+  }
 
-.task-detail {
-  margin-top: 18rpx;
-  font-size: 26rpx;
-  color: #4f5d53;
-  line-height: 1.6;
-}
+  /* Avatar */
+  .avatar {
+    width: 96rpx;
+    height: 96rpx;
+    border-radius: 50%;
+    background: #eef5ef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48rpx;
+    flex-shrink: 0;
+  }
 
-.task-footer {
-  margin-top: 20rpx;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  &.water .avatar { background: #eff6ff; }
+  &.prune .avatar { background: #fff7ed; }
+  &.fertilize .avatar { background: #ecfdf5; }
 
-.task-actions {
-  display: flex;
-  gap: 16rpx;
-}
+  .info {
+    flex: 1;
+  }
 
-.task-date {
-  font-size: 24rpx;
-  color: #8b978e;
-}
+  .title {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #253128;
+    margin-bottom: 8rpx;
+  }
 
-.task-btn {
-  margin: 0;
-  padding: 0 26rpx;
-  height: 64rpx;
-  line-height: 64rpx;
-  border: none;
-  border-radius: 999rpx;
-  background: #3f8f52;
-  color: #fff;
-  font-size: 24rpx;
-}
+  .subtitle {
+    font-size: 26rpx;
+    color: #6d7a70;
+    /* Limit lines for long details */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow: hidden;
+  }
 
-.task-btn.ghost {
-  background: #eef5ef;
-  color: #3f8f52;
+  /* Status Tag */
+  .status {
+    padding: 8rpx 16rpx;
+    border-radius: 8rpx;
+    font-size: 24rpx;
+    font-weight: 500;
+    white-space: nowrap;
+    
+    &.overdue { background: #fee2e2; color: #dc2626; }
+    &.pending { background: #fef3c7; color: #d97706; }
+    &.done { background: #f3f4f6; color: #6b7280; }
+  }
+
+  /* Bottom Actions */
+  .bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 2rpx dashed #f3f4f6;
+    padding-top: 24rpx;
+  }
+
+  .time {
+    font-size: 24rpx;
+    color: #9ca3af;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 16rpx;
+  }
+
+  .btn {
+    margin: 0;
+    padding: 0 32rpx;
+    height: 60rpx;
+    line-height: 60rpx;
+    border-radius: 40rpx;
+    font-size: 26rpx;
+    font-weight: 500;
+    
+    &::after { border: none; }
+
+    &.primary {
+      background: #3f8f52;
+      color: #ffffff;
+      box-shadow: 0 4rpx 12rpx rgba(63, 143, 82, 0.2);
+    }
+
+    &.ghost {
+      background: #f3f4f6;
+      color: #4b5563;
+    }
+  }
+
+  /* Done state dimming */
+  &.done {
+    opacity: 0.6;
+    box-shadow: none;
+    border: 2rpx solid #f3f4f6;
+  }
 }
 </style>

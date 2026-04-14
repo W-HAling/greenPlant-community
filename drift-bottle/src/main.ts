@@ -390,51 +390,391 @@ class StarryBeachCanvas {
     ctx.restore();
   }
 
-  /* 简化版贝壳 */
+  /* 完整复刻参考文件中的贝壳绘制逻辑 */
   private drawShell(s: any) {
     const ctx = this.ctx;
     ctx.save();
     ctx.translate(s.x, s.y); ctx.rotate(s.angle);
     if (s.flip) ctx.scale(-1, 1);
     ctx.scale(s.size, s.size);
-    
-    // 统一画个小贝壳（为了保持代码精简，使用通用扇形贝壳替代五种复杂类型）
     const p = s.palette;
-    ctx.beginPath();
-    ctx.moveTo(0, 5);
-    for (let i = 0; i <= 9; i++) {
-        const ang = -Math.PI * 0.85 + (Math.PI * 1.7 / 9) * i;
-        ctx.lineTo(Math.cos(ang) * 14, Math.sin(ang) * 14 - 4);
+
+    switch (s.type) {
+        case 'fan': this.drawFanShell(p); break;
+        case 'spiral': this.drawSpiralShell(p); break;
+        case 'clam': this.drawClamShell(p); break;
+        case 'cone': this.drawConeShell(p); break;
+        case 'flat': this.drawFlatShell(p); break;
     }
-    ctx.closePath();
-    const fg = ctx.createRadialGradient(0, -4, 2, 0, -4, 14);
-    fg.addColorStop(0, p.inner); fg.addColorStop(0.6, p.body); fg.addColorStop(1, p.edge);
-    ctx.fillStyle = fg; ctx.fill(); ctx.strokeStyle = p.edge; ctx.lineWidth = 0.6; ctx.stroke();
-    
     ctx.restore();
   }
 
+  /* 扇贝 */
+  private drawFanShell(p: any) {
+      const ctx = this.ctx;
+      const ribs = 9;
+      /* 扇面 */
+      ctx.beginPath();
+      ctx.moveTo(0, 5);
+      for (let i = 0; i <= ribs; i++) {
+          const ang = -Math.PI * 0.85 + (Math.PI * 1.7 / ribs) * i;
+          const r = 14;
+          ctx.lineTo(Math.cos(ang) * r, Math.sin(ang) * r - 4);
+      }
+      ctx.closePath();
+      const fg = ctx.createRadialGradient(0, -4, 2, 0, -4, 14);
+      fg.addColorStop(0, p.inner);
+      fg.addColorStop(0.6, p.body);
+      fg.addColorStop(1, p.edge);
+      ctx.fillStyle = fg;
+      ctx.fill();
+      ctx.strokeStyle = p.edge;
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+
+      /* 放射纹 */
+      for (let i = 1; i < ribs; i++) {
+          const ang = -Math.PI * 0.85 + (Math.PI * 1.7 / ribs) * i;
+          ctx.beginPath();
+          ctx.moveTo(0, 5);
+          ctx.lineTo(Math.cos(ang) * 12, Math.sin(ang) * 12 - 4);
+          ctx.strokeStyle = 'rgba(' + this.hexToRgb(p.edge) + ',0.35)';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+      }
+
+      /* 同心弧纹 */
+      for (let r = 5; r <= 11; r += 3) {
+          ctx.beginPath();
+          ctx.arc(0, -4, r, -Math.PI * 0.8, Math.PI * 0.8);
+          ctx.strokeStyle = 'rgba(' + this.hexToRgb(p.edge) + ',0.2)';
+          ctx.lineWidth = 0.4;
+          ctx.stroke();
+      }
+
+      /* 底部铰合 */
+      ctx.beginPath();
+      ctx.ellipse(0, 5, 4, 2, 0, 0, Math.PI * 2);
+      ctx.fillStyle = p.edge;
+      ctx.fill();
+  }
+
+  /* 螺旋贝 */
+  private drawSpiralShell(p: any) {
+      const ctx = this.ctx;
+      ctx.beginPath();
+      for (let a = 0; a < Math.PI * 5; a += 0.1) {
+          const r = 1.5 + a * 1.1;
+          const x = Math.cos(a) * r;
+          const y = -Math.sin(a) * r + 4;
+          a === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = p.body;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(' + this.hexToRgb(p.inner) + ',0.4)';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      /* 顶端小圆 */
+      ctx.beginPath();
+      ctx.arc(0, 4, 2, 0, Math.PI * 2);
+      ctx.fillStyle = p.edge;
+      ctx.fill();
+  }
+
+  /* 蛤蜊 */
+  private drawClamShell(p: any) {
+      const ctx = this.ctx;
+      /* 上壳 */
+      ctx.beginPath();
+      ctx.ellipse(0, -2, 10, 7, 0, Math.PI, 0);
+      const cg = ctx.createLinearGradient(-10, -9, 10, -2);
+      cg.addColorStop(0, p.edge);
+      cg.addColorStop(0.5, p.body);
+      cg.addColorStop(1, p.inner);
+      ctx.fillStyle = cg;
+      ctx.fill();
+      ctx.strokeStyle = p.edge;
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+
+      /* 下壳（微张） */
+      ctx.beginPath();
+      ctx.ellipse(0, -1, 10, 6, 0, 0, Math.PI);
+      const cg2 = ctx.createLinearGradient(-10, -1, 10, 5);
+      cg2.addColorStop(0, p.body);
+      cg2.addColorStop(0.5, p.inner);
+      cg2.addColorStop(1, p.body);
+      ctx.fillStyle = cg2;
+      ctx.fill();
+      ctx.strokeStyle = p.edge;
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+
+      /* 放射纹 */
+      for (let i = -3; i <= 3; i++) {
+          ctx.beginPath();
+          ctx.moveTo(i * 2.5, -2);
+          ctx.lineTo(i * 3.5, -8);
+          ctx.strokeStyle = 'rgba(' + this.hexToRgb(p.edge) + ',0.2)';
+          ctx.lineWidth = 0.4;
+          ctx.stroke();
+      }
+
+      /* 铰合线 */
+      ctx.beginPath();
+      ctx.moveTo(-10, -2);
+      ctx.lineTo(10, -2);
+      ctx.strokeStyle = p.edge;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+  }
+
+  /* 锥形贝（海螺） */
+  private drawConeShell(p: any) {
+      const ctx = this.ctx;
+      /* 锥体轮廓 */
+      ctx.beginPath();
+      ctx.moveTo(0, 12);
+      ctx.lineTo(-8, -10);
+      ctx.quadraticCurveTo(0, -14, 8, -10);
+      ctx.lineTo(0, 12);
+      ctx.closePath();
+      const cg = ctx.createLinearGradient(-8, 0, 8, 0);
+      cg.addColorStop(0, p.edge);
+      cg.addColorStop(0.4, p.body);
+      cg.addColorStop(0.6, p.inner);
+      cg.addColorStop(1, p.edge);
+      ctx.fillStyle = cg;
+      ctx.fill();
+      ctx.strokeStyle = p.edge;
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+
+      /* 横纹 */
+      for (let i = 0; i < 6; i++) {
+          const t = i / 5;
+          const y = 12 - t * 24;
+          const hw = 8 * (1 - t * 0.85);
+          ctx.beginPath();
+          ctx.moveTo(-hw, y);
+          ctx.lineTo(hw, y);
+          ctx.strokeStyle = 'rgba(' + this.hexToRgb(p.edge) + ',0.25)';
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+      }
+
+      /* 顶端开口 */
+      ctx.beginPath();
+      ctx.ellipse(0, -10, 3.5, 1.8, 0, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(' + this.hexToRgb(p.inner) + ',0.6)';
+      ctx.fill();
+      ctx.strokeStyle = p.edge;
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+  }
+
+  /* 扁平贝（花纹） */
+  private drawFlatShell(p: any) {
+      const ctx = this.ctx;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 11, 7, 0, 0, Math.PI * 2);
+      const fg = ctx.createRadialGradient(-2, -1, 1, 0, 0, 11);
+      fg.addColorStop(0, p.inner);
+      fg.addColorStop(0.5, p.body);
+      fg.addColorStop(1, p.edge);
+      ctx.fillStyle = fg;
+      ctx.fill();
+      ctx.strokeStyle = p.edge;
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+
+      /* 花纹斑点 */
+      const spots = [
+          [-4, -2, 1.8], [3, -1.5, 1.5], [-1, 2.5, 1.3],
+          [5, 1, 1.2], [-6, 0.5, 1], [1, -3.5, 1.1], [-2.5, 3.5, 0.9]
+      ];
+      for (const sp of spots) {
+          ctx.beginPath();
+          ctx.arc(sp[0], sp[1], sp[2], 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + this.hexToRgb(p.edge) + ',0.3)';
+          ctx.fill();
+      }
+
+      /* 中线 */
+      ctx.beginPath();
+      ctx.moveTo(-10, 0);
+      ctx.lineTo(10, 0);
+      ctx.strokeStyle = 'rgba(' + this.hexToRgb(p.edge) + ',0.15)';
+      ctx.lineWidth = 0.4;
+      ctx.stroke();
+  }
+
+  /* 完整复刻螃蟹逻辑 */
   private updateAndDrawCrabs(t: number, dt: number) {
     for (const c of this.crabs) {
         if (c.pausing) {
             c.pauseTimer -= dt;
-            if (c.pauseTimer <= 0) { c.pausing = false; c.dir *= (Math.random() > 0.5 ? 1 : -1); }
+            if (c.pauseTimer <= 0) {
+                c.pausing = false;
+                c.dir *= (Math.random() > 0.5 ? 1 : -1);
+            }
+            /* 暂停时钳子缓慢开合 */
+            c.clawPhase += dt * 1.5;
         } else {
             c.x += c.dir * c.speed * 60 * dt;
+            c.walkPhase += c.speed * 8 * dt;
+            c.clawPhase += dt * 3;
+
+            /* 超出范围则暂停并转向 */
             if (c.x < this.W * 0.05 || c.x > this.W * 0.95) {
-                c.pausing = true; c.pauseTimer = 1.5 + Math.random() * 2; c.dir *= -1;
+                c.pausing = true;
+                c.pauseTimer = 1.5 + Math.random() * 2;
+                c.dir *= -1;
+            }
+
+            /* 随机暂停 */
+            if (Math.random() < 0.001) {
+                c.pausing = true;
+                c.pauseTimer = 2 + Math.random() * 3;
             }
         }
-        
+
         const ctx = this.ctx;
         ctx.save();
         ctx.translate(c.x, c.baseY); ctx.scale(c.dir * c.size, c.size);
         
-        ctx.beginPath(); ctx.ellipse(0, 0, 10, 7, 0, 0, Math.PI * 2);
-        ctx.fillStyle = c.color.shell; ctx.fill();
-        
+        const col = c.color;
+        const walkAnim = c.pausing ? 0 : Math.sin(c.walkPhase) * 0.3;
+        const clawOpen = 0.3 + 0.25 * Math.sin(c.clawPhase);
+
+        /* 腿（3对） */
+        ctx.strokeStyle = col.leg;
+        ctx.lineWidth = 1.3;
+        ctx.lineCap = 'round';
+        for (let side = -1; side <= 1; side += 2) {
+            for (let i = 0; i < 3; i++) {
+                const phaseOff = i * Math.PI * 0.7 + (side > 0 ? Math.PI : 0);
+                const swing = c.pausing ? 0 : Math.sin(c.walkPhase + phaseOff) * 0.2;
+                const baseX = side * 6;
+                const baseY = 1 + i * 2.5;
+                const midX = baseX + side * 7;
+                const midY = baseY + 5 + swing * 5;
+                const tipX = midX + side * 6;
+                const tipY = midY + 3 + Math.abs(swing) * 3;
+
+                ctx.beginPath();
+                ctx.moveTo(baseX, baseY);
+                ctx.quadraticCurveTo(midX, midY - 2, midX, midY);
+                ctx.quadraticCurveTo(midX + side * 1, midY + 2, tipX, tipY);
+                ctx.stroke();
+            }
+        }
+
+        /* 身体阴影 */
+        ctx.beginPath();
+        ctx.ellipse(1, 2, 10, 7, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.fill();
+
+        /* 身体（椭圆形壳） */
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 10, 7, 0, 0, Math.PI * 2);
+        const bodyG = ctx.createRadialGradient(-2, -2, 1, 0, 0, 10);
+        bodyG.addColorStop(0, col.shell);
+        bodyG.addColorStop(0.7, col.body);
+        bodyG.addColorStop(1, col.leg);
+        ctx.fillStyle = bodyG;
+        ctx.fill();
+        ctx.strokeStyle = col.leg;
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+
+        /* 壳上花纹 */
+        ctx.beginPath();
+        ctx.ellipse(-1, -1, 5, 3.5, -0.2, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(' + this.hexToRgb(col.shell) + ',0.5)';
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
+
+        /* 小凸点 */
+        const bumps = [[-3, -2], [0, -3], [3, -1.5], [-1, 1], [2, 1.5], [-4, 0.5]];
+        for (const b of bumps) {
+            ctx.beginPath();
+            ctx.arc(b[0], b[1], 0.7, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(' + this.hexToRgb(col.shell) + ',0.6)';
+            ctx.fill();
+        }
+
+        /* 钳子（左） */
+        this.drawClaw(-10, -2, clawOpen, col, -1);
+        /* 钳子（右） */
+        this.drawClaw(10, -2, clawOpen, col, 1);
+
+        /* 眼柄 */
+        ctx.strokeStyle = col.leg;
+        ctx.lineWidth = 1;
+        ctx.lineCap = 'round';
+        /* 左眼 */
+        ctx.beginPath(); ctx.moveTo(-3, -6); ctx.quadraticCurveTo(-4, -11, -3.5, -12); ctx.stroke();
+        /* 右眼 */
+        ctx.beginPath(); ctx.moveTo(3, -6); ctx.quadraticCurveTo(4, -11, 3.5, -12); ctx.stroke();
+
+        /* 眼珠 */
+        ctx.beginPath(); ctx.arc(-3.5, -12, 1.5, 0, Math.PI * 2); ctx.fillStyle = col.eye; ctx.fill();
+        ctx.beginPath(); ctx.arc(-3.5, -12, 0.5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fill();
+
+        ctx.beginPath(); ctx.arc(3.5, -12, 1.5, 0, Math.PI * 2); ctx.fillStyle = col.eye; ctx.fill();
+        ctx.beginPath(); ctx.arc(3.5, -12, 0.5, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.fill();
+
         ctx.restore();
     }
+  }
+
+  private drawClaw(ox: number, oy: number, open: number, col: any, side: number) {
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.translate(ox, oy);
+
+    /* 臂 */
+    ctx.strokeStyle = col.leg;
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(side * 6, -3);
+    ctx.stroke();
+
+    /* 钳子 */
+    ctx.translate(side * 6, -3);
+    const openAngle = open * 0.5;
+
+    /* 上钳 */
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(side * 4, -4 - open * 4, side * 7, -2 - open * 3);
+    ctx.strokeStyle = col.claw;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    /* 下钳 */
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.quadraticCurveTo(side * 4, 2 + open * 3, side * 7, 1 + open * 2);
+    ctx.stroke();
+
+    /* 钳尖 */
+    ctx.beginPath();
+    ctx.arc(side * 7, -2 - open * 3, 1, 0, Math.PI * 2);
+    ctx.fillStyle = col.claw;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(side * 7, 1 + open * 2, 1, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
   }
 
   // --- 外部控制 ---

@@ -17,9 +17,9 @@ body, html {
   position: absolute;
   top: 0; left: 0;
   width: 100%; height: 100%;
-  z-index: 1; /* 置于底层 */
-  pointer-events: none; /* 防止阻挡交互 */
-  display: none; /* 默认隐藏，只有在选择星空主题时显示 */
+  z-index: 1;
+  pointer-events: auto; /* 允许 canvas 接收事件（如涟漪、拾取瓶子） */
+  display: none; 
 }
 
 #app {
@@ -27,7 +27,13 @@ body, html {
   height: 100vh;
   position: relative;
   transition: background 0.5s ease;
-  z-index: 2; /* 保证 UI 在 canvas 之上 */
+  z-index: 2;
+  pointer-events: none; /* 让鼠标事件穿透到 canvas，除了具体的按钮 */
+}
+
+/* 允许内容区的按钮接收事件 */
+#app .tab-container, #app .content button, #app .content .panel-overlay, #app .content .pick-btn, #app .content .wish-btn, #app .content .sound-btn {
+  pointer-events: auto;
 }
 
 /* 顶部切换栏 */
@@ -66,317 +72,93 @@ body, html {
 /* =========================================
    风格1：梦幻深海风
    ========================================= */
-.theme-deep-sea {
-  background: linear-gradient(180deg, #050b14 0%, #1a2a44 100%);
-  color: #fff;
-}
+.theme-deep-sea { background: linear-gradient(180deg, #050b14 0%, #1a2a44 100%); color: #fff; }
 .theme-deep-sea .tab-container { background: rgba(255, 255, 255, 0.1); }
 .theme-deep-sea .tab-btn { color: #ccc; }
 .theme-deep-sea .tab-btn.active { background: #4a90e2; color: #fff; }
-
-.deep-sea-bottle {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80px;
-  height: 160px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(74, 144, 226, 0.3));
-  border: 2px solid rgba(74, 144, 226, 0.6);
-  border-radius: 40px;
-  box-shadow: 0 0 30px rgba(74, 144, 226, 0.4), inset 0 0 20px rgba(74, 144, 226, 0.2);
-  animation: floatDeepSea 4s ease-in-out infinite;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.deep-sea-bottle::before {
-  content: '';
-  position: absolute;
-  top: -15px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 24px;
-  height: 15px;
-  background: #8b5a2b;
-  border-radius: 5px 5px 0 0;
-}
-.deep-sea-glow {
-  width: 30px;
-  height: 30px;
-  background: #fff;
-  border-radius: 50%;
-  filter: blur(8px);
-  animation: pulseGlow 2s infinite alternate;
-}
-@keyframes floatDeepSea {
-  0%, 100% { transform: translate(-50%, -40%); }
-  50% { transform: translate(-50%, -60%); }
-}
-@keyframes pulseGlow {
-  0% { transform: scale(0.8); opacity: 0.6; }
-  100% { transform: scale(1.3); opacity: 1; }
-}
-.deep-sea-particles {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px);
-  background-size: 50px 50px;
-  animation: particleMove 20s linear infinite;
-  opacity: 0.5;
-}
-@keyframes particleMove {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-50px); }
-}
+.deep-sea-bottle { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 160px; background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(74, 144, 226, 0.3)); border: 2px solid rgba(74, 144, 226, 0.6); border-radius: 40px; box-shadow: 0 0 30px rgba(74, 144, 226, 0.4), inset 0 0 20px rgba(74, 144, 226, 0.2); animation: floatDeepSea 4s ease-in-out infinite; display: flex; align-items: center; justify-content: center; }
+.deep-sea-bottle::before { content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 24px; height: 15px; background: #8b5a2b; border-radius: 5px 5px 0 0; }
+.deep-sea-glow { width: 30px; height: 30px; background: #fff; border-radius: 50%; filter: blur(8px); animation: pulseGlow 2s infinite alternate; }
+@keyframes floatDeepSea { 0%, 100% { transform: translate(-50%, -40%); } 50% { transform: translate(-50%, -60%); } }
+@keyframes pulseGlow { 0% { transform: scale(0.8); opacity: 0.6; } 100% { transform: scale(1.3); opacity: 1; } }
+.deep-sea-particles { position: absolute; width: 100%; height: 100%; background-image: radial-gradient(rgba(255,255,255,0.2) 1px, transparent 1px); background-size: 50px 50px; animation: particleMove 20s linear infinite; opacity: 0.5; }
+@keyframes particleMove { 0% { transform: translateY(0); } 100% { transform: translateY(-50px); } }
 
 /* =========================================
    风格2：清新沙滩风
    ========================================= */
-.theme-beach {
-  background: linear-gradient(180deg, #74ebd5 0%, #acb6e5 50%, #f6d365 100%);
-  color: #333;
-}
-.beach-bottle {
-  position: absolute;
-  bottom: 25%;
-  left: 50%;
-  transform: translateX(-50%) rotate(15deg);
-  width: 70px;
-  height: 150px;
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(255,255,255,0.8);
-  border-radius: 35px;
-  box-shadow: 10px 10px 20px rgba(0,0,0,0.1), inset 5px 5px 10px rgba(255,255,255,0.8);
-  animation: rockBeach 6s ease-in-out infinite;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-}
-.beach-bottle::before {
-  content: '';
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 12px;
-  background: #d4a373;
-  border-radius: 4px 4px 0 0;
-}
-.beach-paper {
-  width: 40px;
-  height: 60px;
-  background: #fefae0;
-  border-radius: 3px;
-  box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
-}
-@keyframes rockBeach {
-  0%, 100% { transform: translateX(-50%) rotate(10deg); }
-  50% { transform: translateX(-50%) rotate(20deg); }
-}
-.beach-wave {
-  position: absolute;
-  bottom: 10%;
-  width: 200vw;
-  height: 300px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 40%;
-  animation: wave 8s linear infinite;
-  left: -50%;
-}
-.beach-wave-2 {
-  position: absolute;
-  bottom: 8%;
-  width: 200vw;
-  height: 300px;
-  background: rgba(255,255,255,0.3);
-  border-radius: 45%;
-  animation: wave 12s linear infinite;
-  left: -50%;
-}
-@keyframes wave {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+.theme-beach { background: linear-gradient(180deg, #74ebd5 0%, #acb6e5 50%, #f6d365 100%); color: #333; }
+.beach-bottle { position: absolute; bottom: 25%; left: 50%; transform: translateX(-50%) rotate(15deg); width: 70px; height: 150px; background: rgba(255, 255, 255, 0.4); border: 1px solid rgba(255,255,255,0.8); border-radius: 35px; box-shadow: 10px 10px 20px rgba(0,0,0,0.1), inset 5px 5px 10px rgba(255,255,255,0.8); animation: rockBeach 6s ease-in-out infinite; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.beach-bottle::before { content: ''; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); width: 20px; height: 12px; background: #d4a373; border-radius: 4px 4px 0 0; }
+.beach-paper { width: 40px; height: 60px; background: #fefae0; border-radius: 3px; box-shadow: 2px 2px 5px rgba(0,0,0,0.1); }
+@keyframes rockBeach { 0%, 100% { transform: translateX(-50%) rotate(10deg); } 50% { transform: translateX(-50%) rotate(20deg); } }
+.beach-wave { position: absolute; bottom: 10%; width: 200vw; height: 300px; background: rgba(255,255,255,0.2); border-radius: 40%; animation: wave 8s linear infinite; left: -50%; }
+.beach-wave-2 { position: absolute; bottom: 8%; width: 200vw; height: 300px; background: rgba(255,255,255,0.3); border-radius: 45%; animation: wave 12s linear infinite; left: -50%; }
+@keyframes wave { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
 /* =========================================
    风格3：极简毛玻璃风
    ========================================= */
-.theme-glass {
-  background: #f0f2f5;
-  color: #333;
-  overflow: hidden;
-}
-.glass-blob1 {
-  position: absolute;
-  top: 10%;
-  left: 10%;
-  width: 300px;
-  height: 300px;
-  background: #ff9a9e;
-  border-radius: 50%;
-  filter: blur(60px);
-  animation: moveBlob 10s infinite alternate;
-}
-.glass-blob2 {
-  position: absolute;
-  bottom: 10%;
-  right: 10%;
-  width: 400px;
-  height: 400px;
-  background: #a18cd1;
-  border-radius: 50%;
-  filter: blur(80px);
-  animation: moveBlob 12s infinite alternate-reverse;
-}
-@keyframes moveBlob {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(50px, 50px) scale(1.1); }
-}
-.glass-card {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 280px;
-  height: 400px;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  z-index: 10;
-}
-.glass-icon {
-  width: 60px;
-  height: 120px;
-  border: 3px solid #fff;
-  border-radius: 30px;
-  position: relative;
-  margin-bottom: 30px;
-  animation: floatGlass 3s ease-in-out infinite;
-}
-.glass-icon::after {
-  content: '';
-  position: absolute;
-  bottom: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 40px;
-  background: rgba(255,255,255,0.8);
-  border-radius: 20px;
-}
-@keyframes floatGlass {
-  0%, 100% { transform: translateY(-10px); }
-  50% { transform: translateY(10px); }
-}
+.theme-glass { background: #f0f2f5; color: #333; overflow: hidden; }
+.glass-blob1 { position: absolute; top: 10%; left: 10%; width: 300px; height: 300px; background: #ff9a9e; border-radius: 50%; filter: blur(60px); animation: moveBlob 10s infinite alternate; }
+.glass-blob2 { position: absolute; bottom: 10%; right: 10%; width: 400px; height: 400px; background: #a18cd1; border-radius: 50%; filter: blur(80px); animation: moveBlob 12s infinite alternate-reverse; }
+@keyframes moveBlob { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
+.glass-card { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 280px; height: 400px; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.6); border-radius: 24px; box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; z-index: 10; }
+.glass-icon { width: 60px; height: 120px; border: 3px solid #fff; border-radius: 30px; position: relative; margin-bottom: 30px; animation: floatGlass 3s ease-in-out infinite; }
+.glass-icon::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; background: rgba(255,255,255,0.8); border-radius: 20px; }
+@keyframes floatGlass { 0%, 100% { transform: translateY(-10px); } 50% { transform: translateY(10px); } }
 
 /* =========================================
-   风格4：星空海滩风 (Canvas Canvas 移植版)
+   通用 UI 元素 (非 Starry)
    ========================================= */
-.theme-starry {
-  background: transparent !important; /* 背景交由底层的 Canvas 绘制 */
-  color: #fff;
-}
+.action-btn { margin-top: 20px; padding: 12px 30px; border-radius: 25px; border: none; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s; z-index: 20; position: relative; }
+.action-btn:active { transform: scale(0.95); }
+.theme-deep-sea .action-btn { background: rgba(74, 144, 226, 0.8); color: #fff; box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4); }
+.theme-beach .action-btn { background: #fff; color: #d4a373; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.theme-glass .action-btn { background: rgba(255,255,255,0.8); color: #a18cd1; border: 1px solid #fff; backdrop-filter: blur(10px); }
+.desc-text { position: absolute; bottom: 80px; width: 100%; text-align: center; font-size: 14px; opacity: 0.9; padding: 0 20px; box-sizing: border-box; z-index: 10; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+.desc-text h2 { margin: 0 0 10px 0; font-size: 24px; }
+.desc-text p { margin: 0 0 20px 0; }
+
+/* =========================================
+   风格4：星空海滩风 (code 2.html 新UI)
+   ========================================= */
+.theme-starry { background: transparent !important; color: #fff; }
 .theme-starry .tab-container { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); }
 .theme-starry .tab-btn { color: #ddd; }
 .theme-starry .tab-btn.active { background: #fff; color: #1a365d; }
 
-/* 废除原有的纯 CSS 实现，保留 DOM 仅用于交互（按钮） */
-.starry-sky, .starry-sea, .starry-beach, .sea-bottle, .beach-bottle {
-  display: none !important;
-}
-
-/* 文字与按钮依然保留并适配位置 */
-.theme-starry .desc-text {
-  position: absolute;
-  bottom: 80px;
-  width: 100%;
-  text-align: center;
-  z-index: 20;
-}
-.theme-starry .action-btn {
-  pointer-events: auto; /* 按钮恢复点击 */
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255,255,255,0.4);
-  color: #fff;
-  backdrop-filter: blur(8px);
-}
-.theme-starry .action-btn:hover { background: rgba(255, 255, 255, 0.25); }
-
-
-/* =========================================
-   通用 UI 元素
-   ========================================= */
-.action-btn {
-  margin-top: 20px;
-  padding: 12px 30px;
-  border-radius: 25px;
-  border: none;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s;
-  z-index: 20;
-  position: relative;
-}
-.action-btn:active {
-  transform: scale(0.95);
-}
-.theme-deep-sea .action-btn {
-  background: rgba(74, 144, 226, 0.8);
-  color: #fff;
-  box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
-}
-.theme-beach .action-btn {
-  background: #fff;
-  color: #d4a373;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-.theme-glass .action-btn {
-  background: rgba(255,255,255,0.8);
-  color: #a18cd1;
-  border: 1px solid #fff;
-  backdrop-filter: blur(10px);
-}
-.theme-starry .action-btn {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-}
-.theme-starry .action-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.desc-text {
-  position: absolute;
-  bottom: 80px;
-  width: 100%;
-  text-align: center;
-  font-size: 14px;
-  opacity: 0.9;
-  padding: 0 20px;
-  box-sizing: border-box;
-  z-index: 10;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.8); /* 增加文字阴影，防止在复杂背景下看不清 */
-}
-.desc-text h2 {
-  margin: 0 0 10px 0;
-  font-size: 24px;
-}
-.desc-text p {
-  margin: 0 0 20px 0;
-}
+/* 以下是完全移植 code (2).html 的 UI 样式 */
+.hint{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);font-family:'ZCOOL XiaoWei',serif;font-size:13px;color:rgba(180,200,230,0.4);pointer-events:none;z-index:10;white-space:nowrap;transition:opacity 1.5s}
+.hint.hide{opacity:0}
+.pick-btn{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);font-family:'ZCOOL XiaoWei',serif;font-size:14px;color:rgba(200,215,240,0.7);background:rgba(15,25,50,0.55);border:1px solid rgba(100,140,200,0.22);border-radius:20px;padding:8px 22px;cursor:pointer;z-index:20;transition:all .3s;backdrop-filter:blur(4px);white-space:nowrap}
+.pick-btn:hover:not(:disabled){background:rgba(25,40,70,0.75);color:rgba(230,235,245,0.95);border-color:rgba(120,160,220,0.4)}
+.pick-btn.active{background:rgba(60,120,200,0.25);border-color:rgba(130,180,255,0.4);color:rgba(220,235,255,0.95);box-shadow:0 0 16px rgba(80,140,230,0.15)}
+.pick-btn:disabled{opacity:.35;cursor:not-allowed}
+.wish-btn{position:fixed;bottom:24px;right:24px;font-family:'ZCOOL XiaoWei',serif;font-size:14px;color:rgba(200,215,240,0.65);background:rgba(15,25,50,0.55);border:1px solid rgba(100,140,200,0.2);border-radius:20px;padding:8px 18px;cursor:pointer;z-index:20;transition:all .3s;backdrop-filter:blur(4px);white-space:nowrap}
+.wish-btn:hover{background:rgba(25,40,70,0.8);color:rgba(230,235,245,0.9);border-color:rgba(120,160,220,0.4)}
+.sound-btn{position:fixed;bottom:24px;left:24px;width:36px;height:36px;border-radius:50%;background:rgba(15,25,50,0.55);border:1px solid rgba(100,140,200,0.2);color:rgba(180,200,230,0.55);font-size:14px;cursor:pointer;z-index:20;display:flex;align-items:center;justify-content:center;transition:all .3s;backdrop-filter:blur(4px)}
+.sound-btn:hover{background:rgba(25,40,70,0.8);color:rgba(230,235,245,0.9)}
+.sound-btn.on{color:rgba(140,200,255,0.9);border-color:rgba(100,180,255,0.35)}
+.panel-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .4s}
+.panel-overlay.show{opacity:1;pointer-events:auto}
+.panel-bg{position:absolute;inset:0;background:rgba(0,0,0,0.55)}
+.panel-card{position:relative;background:linear-gradient(145deg,#141e38,#0c1428);border:1px solid rgba(100,140,200,0.2);border-radius:14px;padding:28px 26px;width:360px;max-width:88vw;box-shadow:0 8px 40px rgba(0,0,0,0.6)}
+.panel-card h3{font-family:'ZCOOL XiaoWei',serif;font-size:18px;color:rgba(200,215,240,0.85);margin-bottom:14px;text-align:center;font-weight:400}
+.panel-card textarea{width:100%;height:90px;background:rgba(10,18,35,0.7);border:1px solid rgba(80,120,180,0.25);border-radius:8px;padding:12px;color:rgba(220,228,240,0.9);font-family:'ZCOOL XiaoWei',serif;font-size:14px;resize:none;outline:none;transition:border-color .3s}
+.panel-card textarea:focus{border-color:rgba(120,170,240,0.45)}
+.panel-card textarea::placeholder{color:rgba(140,160,190,0.4)}
+.panel-btns{display:flex;gap:12px;margin-top:16px;justify-content:center}
+.panel-btns button{font-family:'ZCOOL XiaoWei',serif;font-size:14px;padding:7px 24px;border-radius:16px;cursor:pointer;transition:all .3s;border:1px solid}
+.btn-send{background:rgba(60,120,200,0.3);border-color:rgba(100,160,240,0.35)!important;color:rgba(210,225,250,0.9)}
+.btn-send:hover{background:rgba(70,140,220,0.45)}
+.btn-cancel{background:transparent;border-color:rgba(100,140,200,0.2)!important;color:rgba(180,195,220,0.6)}
+.btn-cancel:hover{background:rgba(30,45,70,0.5);color:rgba(210,220,240,0.85)}
+.paper{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scaleY(0);width:270px;z-index:90;pointer-events:none;transition:transform .55s cubic-bezier(.34,1.56,.64,1),opacity .4s;opacity:0}
+.paper.show{transform:translate(-50%,-50%) scaleY(1);opacity:1}
+.paper.hide{transform:translate(-50%,-50%) scaleY(0.95);opacity:0;transition:transform .3s,opacity .3s}
+.cap{height:18px;background:radial-gradient(ellipse at center,#c4a882 30%,#8b7355);border-radius:50%;position:relative;z-index:1}
+.cap-t{margin-bottom:-4px}
+.cap-b{margin-top:-4px}
+.paper-body{background:linear-gradient(90deg,#d0c098,#e6dac0,#d0c098);padding:28px 22px;text-align:center;border-left:2px solid #a09070;border-right:2px solid #a09070;box-shadow:0 4px 24px rgba(0,0,0,0.5)}
+.paper-body p{font-family:'ZCOOL XiaoWei',serif;font-size:15px;color:#4a3a28;line-height:1.9}

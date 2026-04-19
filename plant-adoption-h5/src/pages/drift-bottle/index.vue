@@ -218,49 +218,51 @@ onMounted(() => {
   document.head.appendChild(fontLink)
 
   // 初始化引擎
-  engine.value = createStarryEngine('bg-canvas', {
-    onPickableChange: (has: boolean) => {
-      hasPickable.value = has
-      if (!has && pickMode.value) {
-        pickMode.value = false
-      }
-    },
-    onPickClick: async (bottleRef: any) => {
-      try {
-        uni.showLoading({ title: '捞取中...' })
-        const res = await driftBottleApi.pickBottle()
-        uni.hideLoading()
-        
-        if (res && res.id) {
-          // 成功捞到，播放动画
-          pickedBottle.value = res // 暂存数据，等动画结束显示
-          engine.value.playPickAnim(bottleRef)
-        } else {
-          uni.showToast({ title: '瓶子溜走了', icon: 'none' })
+  setTimeout(() => {
+    engine.value = createStarryEngine('bg-canvas', {
+      onPickableChange: (has: boolean) => {
+        hasPickable.value = has
+        if (!has && pickMode.value) {
+          pickMode.value = false
+        }
+      },
+      onPickClick: async (bottleRef: any) => {
+        try {
+          uni.showLoading({ title: '捞取中...' })
+          const res = await driftBottleApi.pickBottle()
+          uni.hideLoading()
+          
+          if (res && res.id) {
+            // 成功捞到，播放动画
+            pickedBottle.value = res // 暂存数据，等动画结束显示
+            engine.value.playPickAnim(bottleRef)
+          } else {
+            uni.showToast({ title: '瓶子溜走了', icon: 'none' })
+            engine.value.setPickMode(false)
+            pickMode.value = false
+          }
+        } catch (e) {
+          uni.hideLoading()
+          console.error(e)
+          uni.showToast({ title: '捞取失败', icon: 'none' })
           engine.value.setPickMode(false)
           pickMode.value = false
         }
-      } catch (e) {
-        uni.hideLoading()
-        console.error(e)
-        uni.showToast({ title: '捞取失败', icon: 'none' })
+      },
+      onPickCancel: () => {
         engine.value.setPickMode(false)
         pickMode.value = false
+      },
+      onPickAnimEnd: () => {
+        // 动画结束，纸卷自动展开显示 pickedBottle 内容
+        // (由于 pickedBottle.value 已被赋值，模板通过 v-if/class 自动显示)
       }
-    },
-    onPickCancel: () => {
-      engine.value.setPickMode(false)
-      pickMode.value = false
-    },
-    onPickAnimEnd: () => {
-      // 动画结束，纸卷自动展开显示 pickedBottle 内容
-      // (由于 pickedBottle.value 已被赋值，模板通过 v-if/class 自动显示)
-    }
-  })
+    })
 
-  if (engine.value) {
-    engine.value.mount()
-  }
+    if (engine.value) {
+      engine.value.mount()
+    }
+  }, 100)
 })
 
 onBeforeUnmount(() => {

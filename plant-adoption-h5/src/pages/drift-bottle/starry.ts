@@ -1,12 +1,13 @@
 // @ts-nocheck
 export function createStarryEngine(canvasId: string, options: any = {}) {
-    var canvas=document.getElementById(canvasId) as HTMLCanvasElement, ctx=canvas.getContext('2d');
-    if(!canvas || !ctx) return null;
+    var canvas: HTMLCanvasElement | null = null;
+    var ctx: CanvasRenderingContext2D | null = null;
+    
     var TS=4096,SIN=new Float32Array(TS);
     for(var i=0;i<TS;i++)SIN[i]=Math.sin(i/TS*Math.PI*2);
     function fs(x){return SIN[((x/(Math.PI*2)%1+1)%1*TS)|0]}
     function hr(h){return parseInt(h.slice(1,3),16)+','+parseInt(h.slice(3,5),16)+','+parseInt(h.slice(5,7),16)}
-    function rrect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();ctx.fill()}
+    function rrect(x,y,w,h,r){if(!ctx)return;ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();ctx.fill()}
     function dst(a,b,c,d){return Math.hypot(c-a,d-b)}
     function lerp(a,b,t){return a+(b-a)*t}
 
@@ -654,21 +655,44 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
     return {
       mount: function() {
         isRunning = true;
-        init();
-        canvas.addEventListener('click', onClick);
-        canvas.addEventListener('touchstart', onTouch, {passive:false});
-        canvas.addEventListener('mousemove', onMove);
-        window.addEventListener('resize', onResize);
+        
+        var tryInit = function() {
+          if (!isRunning) return;
+          var wrapper = document.getElementById(canvasId);
+          if (wrapper) {
+            canvas = (wrapper.tagName.toLowerCase() === 'uni-canvas' ? wrapper.querySelector('canvas') : wrapper) as HTMLCanvasElement;
+            if (!canvas) canvas = wrapper as HTMLCanvasElement;
+            if (canvas && typeof canvas.getContext === 'function') {
+              ctx = canvas.getContext('2d');
+            } else {
+              ctx = null;
+            }
+          }
+          if (!canvas || !ctx) {
+            requestAnimationFrame(tryInit);
+            return;
+          }
+          
+          init();
+          canvas.addEventListener('click', onClick);
+          canvas.addEventListener('touchstart', onTouch, {passive:false});
+          canvas.addEventListener('mousemove', onMove);
+          window.addEventListener('resize', onResize);
 
-        lastT = performance.now();
-        reqId = requestAnimationFrame(frameWrapper);
+          lastT = performance.now();
+          reqId = requestAnimationFrame(frameWrapper);
+        };
+        
+        tryInit();
       },
       unmount: function() {
         isRunning = false;
         if (reqId) cancelAnimationFrame(reqId);
-        canvas.removeEventListener('click', onClick);
-        canvas.removeEventListener('touchstart', onTouch);
-        canvas.removeEventListener('mousemove', onMove);
+        if (canvas) {
+          canvas.removeEventListener('click', onClick);
+          canvas.removeEventListener('touchstart', onTouch);
+          canvas.removeEventListener('mousemove', onMove);
+        }
         window.removeEventListener('resize', onResize);
 
         if (aCtx && aCtx.state !== 'suspended') {
@@ -680,7 +704,7 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
         if(!waterBottles.some(function(b){return b.alive})&&!sandBottles.some(function(b){return b.alive}) && mode) return;
         if(mode && !aCtx) initAudio();
         pickMode = mode;
-        canvas.style.cursor = mode ? 'crosshair' : 'default';
+        if(canvas) canvas.style.cursor = mode ? 'crosshair' : 'default';
         if (!mode) checkPickable();
       },
       hasPickable: function() {

@@ -19,6 +19,12 @@ public class MinioConfig {
     private String secretKey;
     private String bucketName;
     
+    // 映射 application.yml 中的 minio.minio_external_url
+    private String minioExternalUrl;
+    
+    // 映射 application.yml 中的 minio.minio_internal_url
+    private String minioInternalUrl;
+    
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()

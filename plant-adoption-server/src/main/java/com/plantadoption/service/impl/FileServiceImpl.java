@@ -1,6 +1,7 @@
 package com.plantadoption.service.impl;
 
 import com.plantadoption.common.ErrorCode;
+import com.plantadoption.config.MinioConfig;
 import com.plantadoption.exception.BusinessException;
 import com.plantadoption.service.FileService;
 import io.minio.MinioClient;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 /**
@@ -23,6 +26,7 @@ import java.util.UUID;
 public class FileServiceImpl implements FileService {
     
     private final MinioClient minioClient;
+    private final MinioConfig minioConfig;
     
     @Value("${minio.bucket-name:plant-images}")
     private String bucketName;
@@ -43,7 +47,10 @@ public class FileServiceImpl implements FileService {
             String extension = originalFilename != null && originalFilename.contains(".") 
                 ? originalFilename.substring(originalFilename.lastIndexOf(".")) 
                 : ".jpg";
-            String objectName = UUID.randomUUID().toString().replace("-", "") + extension;
+            
+            // 按照日期划分目录
+            String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+            String objectName = datePath + "/" + UUID.randomUUID().toString().replace("-", "") + extension;
             
             minioClient.putObject(
                 PutObjectArgs.builder()
@@ -53,6 +60,14 @@ public class FileServiceImpl implements FileService {
                     .contentType(file.getContentType())
                     .build()
             );
+            
+            String externalUrl = minioConfig.getMinioExternalUrl();
+            if (externalUrl != null && !externalUrl.isEmpty()) {
+                if (externalUrl.endsWith("/")) {
+                    externalUrl = externalUrl.substring(0, externalUrl.length() - 1);
+                }
+                return externalUrl + "/" + bucket + "/" + objectName;
+            }
             
             return "/" + bucket + "/" + objectName;
             
@@ -69,13 +84,22 @@ public class FileServiceImpl implements FileService {
                 return;
             }
             
-            String[] parts = fileUrl.split("/");
-            if (parts.length < 3) {
+            String externalUrl = minioConfig.getMinioExternalUrl();
+            if (externalUrl != null && fileUrl.startsWith(externalUrl)) {
+                fileUrl = fileUrl.substring(externalUrl.length());
+            }
+            
+            if (fileUrl.startsWith("/")) {
+                fileUrl = fileUrl.substring(1);
+            }
+            
+            int firstSlashIndex = fileUrl.indexOf("/");
+            if (firstSlashIndex == -1) {
                 return;
             }
             
-            String bucket = parts[1];
-            String objectName = parts[2];
+            String bucket = fileUrl.substring(0, firstSlashIndex);
+            String objectName = fileUrl.substring(firstSlashIndex + 1);
             
             minioClient.removeObject(
                 RemoveObjectArgs.builder()
@@ -85,7 +109,7 @@ public class FileServiceImpl implements FileService {
             );
             
         } catch (Exception e) {
-            log.error("文件删除失败", e);
+            log.error("文件删除失败, URL: {}", fileUrl, e);
         }
     }
     

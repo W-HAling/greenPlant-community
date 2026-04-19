@@ -91,7 +91,7 @@ const changeFilter = (status: string) => {
 
 const goExecute = (task: CareTask) => {
   uni.navigateTo({
-    url: `/pages/care/add?plantId=${task.plantId}&taskId=${task.id}&taskType=${encodeURIComponent(task.careType || '')}&taskDetail=${encodeURIComponent(task.careDetail || '')}`
+    url: `/pages/care/add?plantId=${task.plantId}&plantName=${encodeURIComponent(task.plantName || '')}&taskId=${task.id}&taskType=${encodeURIComponent(task.careType || '')}&taskDetail=${encodeURIComponent(task.careDetail || '')}`
   })
 }
 

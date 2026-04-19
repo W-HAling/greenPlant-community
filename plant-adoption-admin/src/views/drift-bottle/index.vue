@@ -22,11 +22,14 @@
     </div>
 
     <el-table :data="tableData" stripe v-loading="loading">
-      <el-table-column prop="id" label="ID" width="80" />
-      <el-table-column prop="senderId" label="发送人" width="100" />
-      <el-table-column prop="receiverId" label="拾取人" width="100">
+      <el-table-column prop="senderName" label="发送人" width="100">
         <template #default="{ row }">
-          {{ row.receiverId || '-' }}
+          {{ row.senderName || row.senderId || '-' }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="receiverName" label="拾取人" width="100">
+        <template #default="{ row }">
+          {{ row.receiverName || row.receiverId || '-' }}
         </template>
       </el-table-column>
       <el-table-column prop="content" label="内容" min-width="260" show-overflow-tooltip />

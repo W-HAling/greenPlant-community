@@ -39,6 +39,12 @@ public class DriftBottle implements Serializable {
 
     private LocalDateTime pickExpireTime;
 
+    @TableField(exist = false)
+    private String senderName;
+
+    @TableField(exist = false)
+    private String receiverName;
+
     @TableLogic
     private Integer deleted;
 

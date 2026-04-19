@@ -8,20 +8,31 @@ import com.plantadoption.dto.DriftBottleReplyDTO;
 import com.plantadoption.dto.DriftBottleThrowDTO;
 import com.plantadoption.entity.DriftBottle;
 import com.plantadoption.entity.DriftBottleLog;
+import com.plantadoption.entity.User;
 import com.plantadoption.exception.BusinessException;
 import com.plantadoption.mapper.DriftBottleLogMapper;
 import com.plantadoption.mapper.DriftBottleMapper;
+import com.plantadoption.mapper.UserMapper;
 import com.plantadoption.service.DriftBottleService;
 import com.plantadoption.service.NotificationService;
 import com.plantadoption.service.SysConfigService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+/**
+ * 漂流瓶服务实现类
+ */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DriftBottleServiceImpl implements DriftBottleService {
@@ -30,6 +41,7 @@ public class DriftBottleServiceImpl implements DriftBottleService {
     private final DriftBottleLogMapper driftBottleLogMapper;
     private final SysConfigService sysConfigService;
     private final NotificationService notificationService;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -87,7 +99,32 @@ public class DriftBottleServiceImpl implements DriftBottleService {
         wrapper.like(safeKeyword != null, DriftBottle::getContent, safeKeyword);
         
         wrapper.orderByDesc(DriftBottle::getCreateTime);
-        return driftBottleMapper.selectPage(page, wrapper);
+        IPage<DriftBottle> resultPage = driftBottleMapper.selectPage(page, wrapper);
+        List<DriftBottle> records = resultPage.getRecords();
+        
+        if (records != null && !records.isEmpty()) {
+            Set<Long> userIds = new HashSet<>();
+            for (DriftBottle bottle : records) {
+                if (bottle.getSenderId() != null) userIds.add(bottle.getSenderId());
+                if (bottle.getReceiverId() != null) userIds.add(bottle.getReceiverId());
+            }
+            
+            if (!userIds.isEmpty()) {
+                List<User> users = userMapper.selectBatchIds(userIds);
+                Map<Long, String> userMap = users.stream()
+                        .collect(Collectors.toMap(User::getId, User::getNickname));
+                        
+                for (DriftBottle bottle : records) {
+                    if (bottle.getSenderId() != null) {
+                        bottle.setSenderName(userMap.get(bottle.getSenderId()));
+                    }
+                    if (bottle.getReceiverId() != null) {
+                        bottle.setReceiverName(userMap.get(bottle.getReceiverId()));
+                    }
+                }
+            }
+        }
+        return resultPage;
     }
 
     @Override

@@ -116,6 +116,8 @@ export interface DriftBottle {
   id: number
   senderId: number
   receiverId?: number
+  senderName?: string
+  receiverName?: string
   content: string
   imageUrls?: string
   status: string

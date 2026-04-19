@@ -641,7 +641,18 @@ export function createStarryEngine(canvasId: string) {
     }
 
     function init(){
-      W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;
+      var dpr = window.devicePixelRatio || 1;
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      if (canvas.style) {
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+      }
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      
       hY=H*.44;bSY=H*.71;mX=W*.15;mY=H*.12;
       makeWaves();initSkyCanvas();initMoonCanvas();initTwStars();initClouds();
       initReflections();initBio();initSandGrains();
@@ -695,12 +706,13 @@ export function createStarryEngine(canvasId: string) {
           if (!isRunning) return;
           var wrapper = document.getElementById(canvasId);
           if (wrapper) {
-            canvas = (wrapper.tagName.toLowerCase() === 'uni-canvas' ? wrapper.querySelector('canvas') : wrapper) as HTMLCanvasElement;
-            if (!canvas) canvas = wrapper as HTMLCanvasElement;
-            if (canvas && typeof canvas.getContext === 'function') {
-              ctx = canvas.getContext('2d');
-            } else {
-              ctx = null;
+            var isUni = wrapper.tagName.toLowerCase() === 'uni-canvas';
+            var inner = isUni ? wrapper.querySelector('canvas') : wrapper;
+            if (inner) {
+              canvas = inner as HTMLCanvasElement;
+              if (typeof canvas.getContext === 'function') {
+                ctx = canvas.getContext('2d');
+              }
             }
           }
           if (!canvas || !ctx) {

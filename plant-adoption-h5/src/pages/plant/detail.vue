@@ -1,11 +1,21 @@
 <template>
   <view class="plant-detail-page">
     <view class="image-section">
-      <image
-        class="plant-image"
-        :src="plant.imageUrl || '/static/images/default-plant.png'"
-        mode="aspectFill"
-      />
+      <swiper
+        class="plant-image-swiper"
+        circular
+        :indicator-dots="imageUrls.length > 1"
+        indicator-active-color="#4CAF50"
+      >
+        <swiper-item v-for="(url, index) in imageUrls" :key="index">
+          <image
+            class="plant-image"
+            :src="url"
+            mode="aspectFill"
+            @click="previewImage(index)"
+          />
+        </swiper-item>
+      </swiper>
       <view class="image-overlay"></view>
       
       <view class="nav-bar">
@@ -197,6 +207,20 @@ const isMyPlant = computed(() => {
   return plant.value.adopterId === userStore.userInfo?.id
 })
 
+const imageUrls = computed(() => {
+  if (!plant.value.imageUrl) return ['/static/images/default-plant.png']
+  return plant.value.imageUrl.split(',').filter(Boolean)
+})
+
+const previewImage = (index: number) => {
+  const urls = imageUrls.value.filter(url => !url.startsWith('/static'))
+  if (urls.length === 0) return
+  uni.previewImage({
+    current: urls[index],
+    urls
+  })
+}
+
 const showBottomBar = computed(() => {
   return plant.value.status === 'AVAILABLE' || isMyPlant.value
 })
@@ -315,6 +339,11 @@ onMounted(() => {
   position: relative;
   width: 100%;
   height: 500rpx;
+  
+  .plant-image-swiper {
+    width: 100%;
+    height: 100%;
+  }
   
   .plant-image {
     width: 100%;

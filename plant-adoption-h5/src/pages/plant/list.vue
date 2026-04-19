@@ -51,7 +51,7 @@
           <view class="plant-image-wrapper">
             <image
               class="plant-image"
-              :src="plant.imageUrl || '/static/images/default-plant.png'"
+              :src="plant.imageUrl?.split(',')[0] || '/static/images/default-plant.png'"
               mode="aspectFill"
             />
             <view class="status-tag" :class="plant.status.toLowerCase()">

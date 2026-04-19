@@ -5,6 +5,7 @@
 
     <!-- 返回与我的瓶子按钮 -->
     <view class="top-bar">
+      <view class="icon-btn" @click="goBack"><i class="fa-solid fa-chevron-left"></i></view>
       <view class="icon-btn" @click="goMyBottles"><i class="fa-solid fa-bottle-water"></i> 我的瓶子</view>
     </view>
 
@@ -90,6 +91,10 @@ const formatTime = (time?: string) => {
   if (!time) return ''
   const date = new Date(time)
   return `${date.getMonth() + 1}-${date.getDate()} ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+}
+
+const goBack = () => {
+  uni.navigateBack()
 }
 
 const goMyBottles = () => {
@@ -313,7 +318,7 @@ onBeforeUnmount(() => {
   left: 20px;
   right: 20px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   z-index: 20;
   pointer-events: auto;
 

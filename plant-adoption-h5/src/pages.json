@@ -161,12 +161,6 @@
         "selectedIconPath": "static/tabbar/community-active.svg"
       },
       {
-        "pagePath": "pages/drift-bottle/index",
-        "text": "漂流瓶",
-        "iconPath": "static/tabbar/bottle.svg",
-        "selectedIconPath": "static/tabbar/bottle-active.svg"
-      },
-      {
         "pagePath": "pages/user/profile",
         "text": "我的",
         "iconPath": "static/tabbar/user.svg",

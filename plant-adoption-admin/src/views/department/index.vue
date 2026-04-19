@@ -32,18 +32,68 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" @close="resetForm">
+      <el-form ref="formRef" :model="formData" :rules="formRules" label-width="100px">
+        <el-form-item label="部门名称" prop="name">
+          <el-input v-model="formData.name" placeholder="请输入部门名称" />
+        </el-form-item>
+        <el-form-item label="负责人" prop="leader">
+          <el-input v-model="formData.leader" placeholder="请输入负责人" />
+        </el-form-item>
+        <el-form-item label="联系电话" prop="phone">
+          <el-input v-model="formData.phone" placeholder="请输入联系电话" />
+        </el-form-item>
+        <el-form-item label="排序" prop="sort">
+          <el-input-number v-model="formData.sort" :min="1" />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-switch v-model="formData.status" :active-value="1" :inactive-value="0" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSubmit" :loading="submitting">确定</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { get, del } from '@/utils/request'
+import type { FormInstance, FormRules } from 'element-plus'
+import { get, post, put, del } from '@/utils/request'
 import type { Department } from '@/api/types'
 import dayjs from 'dayjs'
 
 const loading = ref(false)
 const tableData = ref<Department[]>([])
+
+const dialogVisible = ref(false)
+const dialogTitle = ref('添加部门')
+const formRef = ref<FormInstance>()
+const submitting = ref(false)
+
+const formData = reactive<Partial<Department>>({
+  name: '',
+  parentId: 0,
+  level: 1,
+  leader: '',
+  phone: '',
+  sort: 1,
+  status: 1
+})
+
+const formRules: FormRules = {
+  name: [{ required: true, message: '请输入部门名称', trigger: 'blur' }],
+  leader: [{ required: true, message: '请输入负责人', trigger: 'blur' }]
+}
+
+const resetForm = () => {
+  formRef.value?.resetFields()
+  Object.assign(formData, { id: undefined, name: '', parentId: 0, level: 1, leader: '', phone: '', sort: 1, status: 1 })
+}
 
 const formatDate = (date: string) => {
   return dayjs(date).format('YYYY-MM-DD HH:mm')
@@ -61,11 +111,35 @@ const loadData = async () => {
 }
 
 const handleAdd = () => {
-  ElMessage.info('添加部门功能开发中')
+  dialogTitle.value = '添加部门'
+  dialogVisible.value = true
 }
 
-const handleEdit = (_row: Department) => {
-  ElMessage.info('编辑部门功能开发中')
+const handleEdit = (row: Department) => {
+  dialogTitle.value = '编辑部门'
+  Object.assign(formData, row)
+  dialogVisible.value = true
+}
+
+const handleSubmit = async () => {
+  const valid = await formRef.value?.validate()
+  if (!valid) return
+  submitting.value = true
+  try {
+    if (formData.id) {
+      await put(`/department/${formData.id}`, formData)
+      ElMessage.success('更新成功')
+    } else {
+      await post('/department', formData)
+      ElMessage.success('添加成功')
+    }
+    dialogVisible.value = false
+    loadData()
+  } catch (error) {
+    console.error(error)
+  } finally {
+    submitting.value = false
+  }
 }
 
 const handleDelete = async (row: Department) => {

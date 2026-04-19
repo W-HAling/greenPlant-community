@@ -5,6 +5,11 @@ import com.plantadoption.entity.Department;
 import com.plantadoption.service.DepartmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,5 +70,30 @@ public class DepartmentController {
         mockList.add(productDept);
         
         return mockList;
+    }
+
+    /**
+     * 添加部门
+     */
+    @PostMapping
+    public Result<Boolean> addDepartment(@RequestBody Department department) {
+        return Result.success(departmentService.save(department));
+    }
+
+    /**
+     * 修改部门
+     */
+    @PutMapping("/{id}")
+    public Result<Boolean> updateDepartment(@PathVariable Long id, @RequestBody Department department) {
+        department.setId(id);
+        return Result.success(departmentService.updateById(department));
+    }
+
+    /**
+     * 删除部门
+     */
+    @DeleteMapping("/{id}")
+    public Result<Boolean> deleteDepartment(@PathVariable Long id) {
+        return Result.success(departmentService.removeById(id));
     }
 }

@@ -1,5 +1,8 @@
 package com.plantadoption.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.plantadoption.common.Result;
 import com.plantadoption.dto.UserUpdateDTO;
 import com.plantadoption.entity.User;
@@ -9,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -29,6 +33,33 @@ public class UserController {
         User user = userService.getUserDetail(userId);
         user.setPassword(null);
         return Result.success(user);
+    }
+
+    @Operation(summary = "获取用户列表")
+    @GetMapping("/list")
+    public Result<IPage<User>> getUserList(
+            @RequestParam(defaultValue = "1") Integer current,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) String nickname,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) Long departmentId,
+            @RequestParam(required = false) String role) {
+        
+        Page<User> page = new Page<>(current, size);
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        
+        wrapper.like(StringUtils.hasText(nickname), User::getNickname, nickname);
+        wrapper.like(StringUtils.hasText(phone), User::getPhone, phone);
+        wrapper.eq(departmentId != null, User::getDepartmentId, departmentId);
+        wrapper.eq(StringUtils.hasText(role), User::getRole, role);
+        wrapper.orderByDesc(User::getCreateTime);
+        
+        IPage<User> result = userService.page(page, wrapper);
+        
+        // 擦除敏感信息
+        result.getRecords().forEach(user -> user.setPassword(null));
+        
+        return Result.success(result);
     }
     
     @Operation(summary = "更新用户信息")

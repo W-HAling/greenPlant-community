@@ -77,8 +77,15 @@ public class DriftBottleServiceImpl implements DriftBottleService {
     @Override
     public IPage<DriftBottle> pageBottles(Page<DriftBottle> page, String status, String keyword) {
         LambdaQueryWrapper<DriftBottle> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StringUtils.hasText(status), DriftBottle::getStatus, status.trim());
-        wrapper.like(StringUtils.hasText(keyword), DriftBottle::getContent, keyword.trim());
+        
+        // 1. 安全预处理入参，剔除前后空格。如果为 null 则保持为 null，避免 NullPointerException
+        String safeStatus = StringUtils.hasText(status) ? status.trim() : null;
+        String safeKeyword = StringUtils.hasText(keyword) ? keyword.trim() : null;
+
+        // 2. 根据预处理后的安全变量构建查询条件
+        wrapper.eq(safeStatus != null, DriftBottle::getStatus, safeStatus);
+        wrapper.like(safeKeyword != null, DriftBottle::getContent, safeKeyword);
+        
         wrapper.orderByDesc(DriftBottle::getCreateTime);
         return driftBottleMapper.selectPage(page, wrapper);
     }

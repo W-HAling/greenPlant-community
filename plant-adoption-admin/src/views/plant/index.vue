@@ -37,8 +37,9 @@
       <el-table-column prop="imageUrl" label="图片" width="100">
         <template #default="{ row }">
           <el-image
-            :src="row.imageUrl"
-            :preview-src-list="[row.imageUrl]"
+            v-if="row.imageUrl"
+            :src="row.imageUrl.split(',')[0]"
+            :preview-src-list="row.imageUrl.split(',').filter(Boolean)"
             fit="cover"
             style="width: 60px; height: 60px; border-radius: 4px"
           />
@@ -113,6 +114,20 @@
             placeholder="请输入描述"
           />
         </el-form-item>
+        <el-form-item label="图片" prop="imageUrl">
+          <el-upload
+            action="/api/upload/image"
+            :headers="uploadHeaders"
+            list-type="picture-card"
+            v-model:file-list="fileList"
+            :on-success="handleUploadSuccess"
+            :on-remove="handleUploadRemove"
+            accept="image/*"
+            multiple
+          >
+            <el-icon><Plus /></el-icon>
+          </el-upload>
+        </el-form-item>
         <el-form-item label="养护提示" prop="careTips">
           <el-input
             v-model="formData.careTips"
@@ -146,13 +161,42 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance, FormRules, UploadUserFile, UploadProps } from 'element-plus'
 import { getPlantList, createPlant, updatePlant, deletePlant } from '@/api/plant'
 import { getCarePlanTemplateList } from '@/api/care-plan'
 import type { CarePlanTemplate, Plant } from '@/api/types'
+import { useUserStore } from '@/stores/user'
 import dayjs from 'dayjs'
+
+const userStore = useUserStore()
+const uploadHeaders = computed(() => ({
+  Authorization: `Bearer ${userStore.token}`
+}))
+
+const fileList = ref<UploadUserFile[]>([])
+
+const handleUploadSuccess: UploadProps['onSuccess'] = (res, file) => {
+  if (res.code === 200) {
+    file.url = res.data
+    updateImageUrl()
+  } else {
+    ElMessage.error(res.message || '上传失败')
+    fileList.value.pop()
+  }
+}
+
+const handleUploadRemove: UploadProps['onRemove'] = () => {
+  updateImageUrl()
+}
+
+const updateImageUrl = () => {
+  const urls = fileList.value
+    .map(f => f.url || (f.response as any)?.data)
+    .filter(Boolean)
+  formData.imageUrl = urls.join(',')
+}
 
 const loading = ref(false)
 const submitting = ref(false)
@@ -259,14 +303,24 @@ const handleAdd = () => {
     status: 'AVAILABLE',
     description: '',
     careTips: '',
-    carePlanTemplateId: undefined
+    carePlanTemplateId: undefined,
+    imageUrl: ''
   })
+  fileList.value = []
   dialogVisible.value = true
 }
 
 const handleEdit = (row: Plant) => {
   dialogTitle.value = '编辑绿植'
   Object.assign(formData, row)
+  if (row.imageUrl) {
+    fileList.value = row.imageUrl.split(',').filter(Boolean).map((url, index) => ({
+      name: `image-${index}`,
+      url
+    }))
+  } else {
+    fileList.value = []
+  }
   dialogVisible.value = true
 }
 

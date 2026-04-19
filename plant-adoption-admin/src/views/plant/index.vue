@@ -40,6 +40,8 @@
             v-if="row.imageUrl"
             :src="row.imageUrl.split(',')[0]"
             :preview-src-list="row.imageUrl.split(',').filter(Boolean)"
+            preview-teleported
+            :z-index="9999"
             fit="cover"
             style="width: 60px; height: 60px; border-radius: 4px"
           />

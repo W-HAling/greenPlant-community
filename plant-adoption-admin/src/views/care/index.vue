@@ -25,6 +25,8 @@
             v-if="row.images"
             :src="parseImages(row.images)[0]"
             :preview-src-list="parseImages(row.images)"
+            preview-teleported
+            :z-index="9999"
             fit="cover"
             style="width: 60px; height: 60px; border-radius: 4px"
           />

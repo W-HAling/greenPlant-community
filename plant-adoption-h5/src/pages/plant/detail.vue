@@ -1,5 +1,10 @@
 <template>
   <view class="plant-detail-page">
+    <view class="fixed-nav-bar">
+      <view class="back-btn" @click="goBack">
+        <text class="back-icon">←</text>
+      </view>
+    </view>
     <view class="image-section">
       <swiper
         class="plant-image-swiper"
@@ -18,20 +23,12 @@
       </swiper>
       <view class="image-overlay"></view>
       
-      <view class="nav-bar">
-        <view class="back-btn" @click="goBack">
-          <text class="back-icon">←</text>
-        </view>
-        <view class="nav-placeholder"></view>
-      </view>
-      
       <view class="status-badge" :class="plant.status?.toLowerCase()">
         <text class="status-icon">{{ statusIcon[plant.status] }}</text>
         <text class="status-text">{{ statusMap[plant.status] }}</text>
       </view>
     </view>
     
-    <scroll-view scroll-y class="content-scroll" :style="{ bottom: showBottomBar ? '140rpx' : '0' }">
     <view class="content-section">
       <view class="plant-header">
         <text class="plant-name">{{ plant.name }}</text>
@@ -122,11 +119,10 @@
         </view>
       </view>
       
-      <view class="bottom-space"></view>
+      <view class="bottom-space" :style="{ height: showBottomBar ? 'calc(160rpx + env(safe-area-inset-bottom))' : 'calc(40rpx + env(safe-area-inset-bottom))' }"></view>
     </view>
-    </scroll-view>
     
-    <view class="bottom-bar" v-if="plant.status === 'AVAILABLE' || isMyPlant">
+    <view class="bottom-bar" v-if="showBottomBar">
       <view 
         class="action-btn secondary" 
         v-if="plant.status === 'ADOPTED' && isMyPlant"
@@ -335,6 +331,36 @@ onMounted(() => {
   flex-direction: column;
 }
 
+.fixed-nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  display: flex;
+  justify-content: space-between;
+  padding: 24rpx 32rpx;
+  padding-top: calc(24rpx + env(safe-area-inset-top));
+  pointer-events: none;
+}
+
+.back-btn {
+  pointer-events: auto;
+  width: 72rpx;
+  height: 72rpx;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+  
+  .back-icon {
+    color: #333;
+    font-size: 36rpx;
+  }
+}
+
 .image-section {
   position: relative;
   width: 100%;
@@ -357,37 +383,6 @@ onMounted(() => {
     right: 0;
     height: 120rpx;
     background: linear-gradient(transparent, rgba(0, 0, 0, 0.3));
-  }
-  
-  .nav-bar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: space-between;
-    padding: 24rpx 32rpx;
-    padding-top: calc(24rpx + env(safe-area-inset-top));
-  }
-  
-  .back-btn {
-    width: 72rpx;
-    height: 72rpx;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
-    
-    .back-icon {
-      color: #333;
-      font-size: 36rpx;
-    }
-  }
-  
-  .nav-placeholder {
-    width: 72rpx;
   }
   
   .status-badge {
@@ -425,15 +420,10 @@ onMounted(() => {
   }
 }
 
-.content-scroll {
-  flex: 1;
-  height: calc(100vh - 500rpx);
-}
-
 .content-section {
   margin-top: -40rpx;
   position: relative;
-  //z-index: 10;
+  z-index: 10;
 }
 
 .plant-header {
@@ -656,7 +646,8 @@ onMounted(() => {
 }
 
 .bottom-space {
-  height: 40rpx;
+  /* 高度通过模板内的 :style 动态设置 */
+  width: 100%;
 }
 
 .bottom-bar {

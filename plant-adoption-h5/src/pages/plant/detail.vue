@@ -661,6 +661,7 @@ onMounted(() => {
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
   background: #FFFFFF;
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
+  z-index: 999;
 }
 
 .action-btn {

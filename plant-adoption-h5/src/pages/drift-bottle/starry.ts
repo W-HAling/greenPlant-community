@@ -280,14 +280,31 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
       ctx.restore();
     }
 
-    var waterBottles=[
-      {xr:.14,li:2,alive:true},{xr:.36,li:3,alive:true},
-      {xr:.56,li:1,alive:true},{xr:.76,li:4,alive:true},{xr:.92,li:3,alive:true}
-    ];
-    var sandBottles=[
-      {xr:.08,yr:.79,an:-.12,sc:1.05,alive:true},{xr:.40,yr:.83,an:.18,sc:.9,alive:true},
-      {xr:.65,yr:.77,an:-.22,sc:1.1,alive:true},{xr:.88,yr:.85,an:.08,sc:.85,alive:true}
-    ];
+    var waterBottles=[];
+    var sandBottles=[];
+    
+    function initBottlesCount(count){
+      waterBottles=[];
+      sandBottles=[];
+      var displayCount = Math.min(count, 12);
+      for(var i=0; i<displayCount; i++){
+        if(Math.random() > 0.4){
+          waterBottles.push({
+            xr: 0.1 + Math.random()*0.8,
+            li: 1 + Math.floor(Math.random()*3),
+            alive: true
+          });
+        } else {
+          sandBottles.push({
+            xr: 0.1 + Math.random()*0.8,
+            yr: 0.75 + Math.random()*0.15,
+            an: (Math.random()-0.5)*0.5,
+            sc: 0.8 + Math.random()*0.3,
+            alive: true
+          });
+        }
+      }
+    }
 
     function throwBottle(tx,ty){
       thrownB.push({x:tx,y:ty-120,vx:(Math.random()-.5)*.3,vy:0,state:'fall',li:2+Math.floor(Math.random()*3),timer:0,sc:1,an:0});
@@ -633,6 +650,7 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
       makeWaves();initSkyCanvas();initMoonCanvas();initTwStars();initClouds();
       initReflections();initBio();initSandGrains();
       initShells();initCrabs();
+      initBottlesCount(options.initialBottleCount !== undefined ? options.initialBottleCount : 0);
       thrownB=[];splashes=[];ripples=[];wShells=[];meteors=[];waterBPos=[];sandBPos=[];
       pickMode=false;pickingAnim=null;hintOn=true;
       if(options.onPickableChange) options.onPickableChange(checkPickable());
@@ -756,8 +774,14 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
         return aOn;
       },
       addBottles: function(count: number) {
-        // Mock function to randomly spawn a bottle if requested by the frontend
-        sandBottles.push({xr: Math.random() * 0.8 + 0.1, yr: 0.75 + Math.random() * 0.1, an: (Math.random()-0.5)*0.5, sc: 0.8+Math.random()*0.3, alive: true});
+        // Randomly spawn a bottle if requested by the frontend
+        for(var i=0; i<count; i++){
+          sandBottles.push({xr: Math.random() * 0.8 + 0.1, yr: 0.75 + Math.random() * 0.1, an: (Math.random()-0.5)*0.5, sc: 0.8+Math.random()*0.3, alive: true});
+        }
+        checkPickable();
+      },
+      setBottleCount: function(count: number) {
+        initBottlesCount(count);
         checkPickable();
       }
     };

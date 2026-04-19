@@ -216,5 +216,9 @@ export const driftBottleApi = {
 
   getMyBottles: (params?: { type?: string }) => {
     return get<DriftBottle[]>('/drift-bottle/my', params)
+  },
+
+  getList: (params?: { current?: number; size?: number; status?: string; keyword?: string }) => {
+    return get<PageResult<DriftBottle>>('/drift-bottle/list', params)
   }
 }

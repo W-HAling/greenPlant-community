@@ -138,6 +138,7 @@ const doThrowBottle = async () => {
     
     // 播放抛出动画
     if (engine.value) engine.value.doThrow()
+    setTimeout(fetchBottleCount, 1500)
     
     // 提示
     showTemporaryPaper(`"${throwContent.value}" 已随浪远去...`)
@@ -158,6 +159,7 @@ const releaseBottle = async () => {
     closePaper()
     // 给海面增加一个新瓶子（视觉效果）
     if (engine.value) engine.value.addBottles(1)
+    setTimeout(fetchBottleCount, 1000)
   } catch (e) {
     uni.hideLoading()
     console.error(e)
@@ -204,6 +206,19 @@ const closePaper = () => {
   }, 350)
 }
 
+const fetchBottleCount = async () => {
+  try {
+    const res = await driftBottleApi.getList({ current: 1, size: 1, status: 'FLOATING' })
+    if (res && res.total !== undefined) {
+      if (engine.value) {
+        engine.value.setBottleCount(res.total)
+      }
+    }
+  } catch (e) {
+    console.error('获取漂流瓶数量失败', e)
+  }
+}
+
 onMounted(() => {
   // 注入 FontAwesome
   const link = document.createElement('link')
@@ -236,10 +251,13 @@ onMounted(() => {
             // 成功捞到，播放动画
             pickedBottle.value = res // 暂存数据，等动画结束显示
             engine.value.playPickAnim(bottleRef)
+            // 稍后更新剩余数量
+            setTimeout(fetchBottleCount, 1000)
           } else {
             uni.showToast({ title: '瓶子溜走了', icon: 'none' })
             engine.value.setPickMode(false)
             pickMode.value = false
+            fetchBottleCount()
           }
         } catch (e) {
           uni.hideLoading()
@@ -247,6 +265,7 @@ onMounted(() => {
           uni.showToast({ title: '捞取失败', icon: 'none' })
           engine.value.setPickMode(false)
           pickMode.value = false
+          fetchBottleCount()
         }
       },
       onPickCancel: () => {
@@ -261,6 +280,7 @@ onMounted(() => {
 
     if (engine.value) {
       engine.value.mount()
+      fetchBottleCount()
     }
   }, 100)
 })

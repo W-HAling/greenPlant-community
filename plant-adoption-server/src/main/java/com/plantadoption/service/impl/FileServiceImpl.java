@@ -44,14 +44,23 @@ public class FileServiceImpl implements FileService {
     public String uploadFile(MultipartFile file, String bucket) {
         try {
             String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename != null && originalFilename.contains(".") 
-                ? originalFilename.substring(originalFilename.lastIndexOf(".")) 
+            String extension = originalFilename != null && originalFilename.contains(".")
+                ? originalFilename.substring(originalFilename.lastIndexOf("."))
                 : ".jpg";
-            
+
             // 按照日期划分目录
             String datePath = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
             String objectName = datePath + "/" + UUID.randomUUID().toString().replace("-", "") + extension;
-            
+
+            // 检查桶是否存在并创建
+            boolean isExist = minioClient.bucketExists(io.minio.BucketExistsArgs.builder().bucket(bucket).build());
+            if (!isExist) {
+                minioClient.makeBucket(io.minio.MakeBucketArgs.builder().bucket(bucket).build());
+                // 可选：设置桶的访问策略为 public
+                String policy = "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetBucketLocation\",\"s3:ListBucket\"],\"Resource\":[\"arn:aws:s3:::" + bucket + "\"]},{\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Action\":[\"s3:GetObject\"],\"Resource\":[\"arn:aws:s3:::" + bucket + "/*\"]}]}";
+                minioClient.setBucketPolicy(io.minio.SetBucketPolicyArgs.builder().bucket(bucket).config(policy).build());
+            }
+
             minioClient.putObject(
                 PutObjectArgs.builder()
                     .bucket(bucket)
@@ -124,10 +133,14 @@ public class FileServiceImpl implements FileService {
         
         String contentType = file.getContentType();
         boolean isValidType = false;
-        for (String allowedType : ALLOWED_IMAGE_TYPES) {
-            if (allowedType.equals(contentType)) {
-                isValidType = true;
-                break;
+        if (contentType != null && (contentType.startsWith("image/") || contentType.equals("application/octet-stream"))) {
+            isValidType = true;
+        } else {
+            for (String allowedType : ALLOWED_IMAGE_TYPES) {
+                if (allowedType.equals(contentType)) {
+                    isValidType = true;
+                    break;
+                }
             }
         }
         

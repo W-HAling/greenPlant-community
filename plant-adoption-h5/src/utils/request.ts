@@ -140,15 +140,23 @@ export const uploadFile = (filePath: string): Promise<string> => {
         'Authorization': `Bearer ${token}`
       },
       success: (res) => {
-        const data = JSON.parse(res.data)
-        if (data.code === 200) {
-          resolve(data.data)
-        } else {
+        try {
+          const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data
+          if (data.code === 200) {
+            resolve(data.data)
+          } else {
+            uni.showToast({
+              title: data.message || '上传失败',
+              icon: 'none'
+            })
+            reject(data)
+          }
+        } catch (e) {
           uni.showToast({
-            title: data.message || '上传失败',
+            title: '上传失败(服务器错误)',
             icon: 'none'
           })
-          reject(data)
+          reject(e)
         }
       },
       fail: (err) => {

@@ -1,7 +1,7 @@
 <template>
   <view class="bottle-page theme-starry">
-    <!-- 背景 Canvas -->
-    <canvas canvas-id="bg-canvas" id="bg-canvas" class="bg-canvas"></canvas>
+    <!-- 背景 Canvas 容器 -->
+    <view id="bg-canvas-container" class="bg-canvas"></view>
 
     <!-- 返回与我的瓶子按钮 -->
     <view class="top-bar">
@@ -219,7 +219,7 @@ onMounted(() => {
 
   // 初始化引擎
   setTimeout(() => {
-    engine.value = createStarryEngine('bg-canvas', {
+    engine.value = createStarryEngine('bg-canvas-container', {
       onPickableChange: (has: boolean) => {
         hasPickable.value = has
         if (!has && pickMode.value) {

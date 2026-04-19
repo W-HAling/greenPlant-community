@@ -315,7 +315,8 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
       if(p>=1){
         pickingAnim=null;
         pickMode=false;
-        canvas.style.cursor='default';
+        var container = document.getElementById(canvasId);
+        if(container) container.style.cursor='default';
         checkPickable();
         if(options.onPickAnimEnd) options.onPickAnimEnd();
         return;
@@ -611,16 +612,22 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
 
     function init(){
       var dpr = window.devicePixelRatio || 1;
-      W = window.innerWidth;
-      H = window.innerHeight;
-      canvas.width = W * dpr;
-      canvas.height = H * dpr;
-      if (canvas.style) {
-        canvas.style.width = W + 'px';
-        canvas.style.height = H + 'px';
+      var container = document.getElementById(canvasId);
+      W = container ? container.offsetWidth : window.innerWidth;
+      H = container ? container.offsetHeight : window.innerHeight;
+      
+      if (canvas) {
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        if (canvas.style) {
+          canvas.style.width = W + 'px';
+          canvas.style.height = H + 'px';
+        }
       }
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.scale(dpr, dpr);
+      if (ctx) {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.scale(dpr, dpr);
+      }
       
       hY=H*.44;bSY=H*.71;mX=W*.15;mY=H*.12;
       makeWaves();initSkyCanvas();initMoonCanvas();initTwStars();initClouds();
@@ -653,11 +660,12 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
     var onMove = function(e){
       mx=e.clientX;my=e.clientY;
       var sy=bSY+curTide;var onW=(my>hY&&my<sy+10);
+      var container = document.getElementById(canvasId);
       if(pickMode){
         var b=tryPickAt(mx,my);
-        canvas.style.cursor=b?'pointer':'crosshair';
+        if (container) container.style.cursor=b?'pointer':'crosshair';
       }else{
-        canvas.style.cursor=onW?'pointer':'default';
+        if (container) container.style.cursor=onW?'pointer':'default';
         if(onW&&Math.random()<.12)ripples.push({x:mx,y:my,rad:1,life:.6});
       }
     };
@@ -669,15 +677,24 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
         
         var tryInit = function() {
           if (!isRunning) return;
-          var wrapper = document.getElementById(canvasId);
-          if (wrapper) {
-            var isUni = wrapper.tagName.toLowerCase() === 'uni-canvas';
-            var inner = isUni ? wrapper.querySelector('canvas') : wrapper;
-            if (inner) {
-              canvas = inner as HTMLCanvasElement;
-              if (typeof canvas.getContext === 'function') {
-                ctx = canvas.getContext('2d');
-              }
+          var container = document.getElementById(canvasId);
+          if (container) {
+            // 如果容器中还没有 canvas，则创建一个
+            var existingCanvas = container.querySelector('canvas');
+            if (!existingCanvas) {
+              canvas = document.createElement('canvas');
+              canvas.style.position = 'absolute';
+              canvas.style.top = '0';
+              canvas.style.left = '0';
+              canvas.style.width = '100%';
+              canvas.style.height = '100%';
+              canvas.style.pointerEvents = 'none'; // 让事件穿透到外层或在此层处理
+              container.appendChild(canvas);
+            } else {
+              canvas = existingCanvas as HTMLCanvasElement;
+            }
+            if (typeof canvas.getContext === 'function') {
+              ctx = canvas.getContext('2d');
             }
           }
           if (!canvas || !ctx) {
@@ -686,9 +703,9 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
           }
           
           init();
-          canvas.addEventListener('click', onClick);
-          canvas.addEventListener('touchstart', onTouch, {passive:false});
-          canvas.addEventListener('mousemove', onMove);
+          container.addEventListener('click', onClick);
+          container.addEventListener('touchstart', onTouch, {passive:false});
+          container.addEventListener('mousemove', onMove);
           window.addEventListener('resize', onResize);
 
           lastT = performance.now();
@@ -700,10 +717,11 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
       unmount: function() {
         isRunning = false;
         if (reqId) cancelAnimationFrame(reqId);
-        if (canvas) {
-          canvas.removeEventListener('click', onClick);
-          canvas.removeEventListener('touchstart', onTouch);
-          canvas.removeEventListener('mousemove', onMove);
+        var container = document.getElementById(canvasId);
+        if (container) {
+          container.removeEventListener('click', onClick);
+          container.removeEventListener('touchstart', onTouch);
+          container.removeEventListener('mousemove', onMove);
         }
         window.removeEventListener('resize', onResize);
 
@@ -716,7 +734,8 @@ export function createStarryEngine(canvasId: string, options: any = {}) {
         if(!waterBottles.some(function(b){return b.alive})&&!sandBottles.some(function(b){return b.alive}) && mode) return;
         if(mode && !aCtx) initAudio();
         pickMode = mode;
-        if(canvas) canvas.style.cursor = mode ? 'crosshair' : 'default';
+        var container = document.getElementById(canvasId);
+        if(container) container.style.cursor = mode ? 'crosshair' : 'default';
         if (!mode) checkPickable();
       },
       hasPickable: function() {
